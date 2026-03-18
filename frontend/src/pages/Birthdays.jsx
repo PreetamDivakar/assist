@@ -20,7 +20,7 @@ export default function Birthdays() {
   const [editItem, setEditItem] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [error, setError] = useState(null);
-  const [form, setForm] = useState({ name: '', date: '', notes: '' });
+  const [form, setForm] = useState({ name: '', date: '', notes: '', reminder_enabled: true });
 
   const currentMonth = new Date().getMonth() + 1;
 
@@ -57,8 +57,9 @@ export default function Birthdays() {
       }
       setShowAdd(false);
       setEditItem(null);
-      setForm({ name: '', date: '', notes: '' });
+      setForm({ name: '', date: '', notes: '', reminder_enabled: true });
       await load();
+      alert('Birthday saved successfully!');
     } catch (e) {
       console.error(e);
       alert(e.message || 'Failed to save birthday');
@@ -78,8 +79,8 @@ export default function Birthdays() {
   const openEdit = (b) => {
     setEditItem(b);
     // Ensure date is in YYYY-MM-DD format for the input
-    const dateStr = b.date ? b.date.split('T')[0] : '';
-    setForm({ name: b.name, date: dateStr, notes: b.notes || '' });
+    const dateStr = b.date ? (typeof b.date === 'string' ? b.date.split('T')[0] : b.date) : '';
+    setForm({ name: b.name, date: dateStr, notes: b.notes || '', reminder_enabled: b.reminder_enabled ?? true });
     setShowAdd(true);
   };
 
@@ -213,6 +214,15 @@ export default function Birthdays() {
           <Input label="Name" value={form.name} onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Enter name" />
           <Input label="Date" type="date" value={form.date} onChange={(e) => setForm(p => ({ ...p, date: e.target.value }))} />
           <TextArea label="Notes" value={form.notes} onChange={(e) => setForm(p => ({ ...p, notes: e.target.value }))} placeholder="Optional notes" rows={2} />
+          <label className="flex items-center gap-2 text-sm dark:text-text-dark cursor-pointer">
+            <input 
+              type="checkbox" 
+              checked={form.reminder_enabled} 
+              onChange={(e) => setForm(p => ({ ...p, reminder_enabled: e.target.checked }))} 
+              className="w-4 h-4 rounded accent-primary"
+            />
+            <span>Enable Reminders</span>
+          </label>
           <Button onClick={handleSave} isLoading={loading}>Save</Button>
         </div>
       </Modal>

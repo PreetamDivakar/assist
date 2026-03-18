@@ -71,12 +71,20 @@ def update_birthday(db: Session, birthday_id: int, data: dict):
         return None
     for key, value in data.items():
         if value is not None:
+            # Type safety and common conversion fixes for remote DBs
             if key == "date" and isinstance(value, str):
                 value = date.fromisoformat(value.split('T')[0])
+            elif key == "reminder_enabled" and isinstance(value, str):
+                value = value.lower() == 'true'
             setattr(birthday, key, value)
-    db.flush()
-    db.commit()
-    db.refresh(birthday)
+    
+    try:
+        db.flush()
+        db.commit()
+        db.refresh(birthday)
+    except Exception as e:
+        db.rollback()
+        raise e
     return enrich_birthday(birthday)
 
 
