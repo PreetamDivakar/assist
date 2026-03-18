@@ -84,7 +84,7 @@ export default function Home() {
             onClick={() => navigate(section.path)}
             className={`
               group relative flex cursor-pointer flex-col items-center justify-center 
-              aspect-square rounded-[2.5rem] md:rounded-[3rem] p-4 md:p-8 
+              min-h-[160px] md:min-h-[220px] rounded-[2.5rem] md:rounded-[3rem] p-5 md:p-8 
               glass dark:glass-dark premium-shadow overflow-hidden
             `}
             initial={{ opacity: 0, y: 30 }}
@@ -97,23 +97,23 @@ export default function Home() {
             <div className={`absolute inset-0 bg-gradient-to-br ${section.gradient} opacity-[0.03] dark:opacity-[0.1] group-hover:opacity-[0.08] dark:group-hover:opacity-[0.15] transition-opacity`} />
             
             <div className={`
-              mb-4 flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-[1.5rem] md:rounded-[2rem]
-              bg-gradient-to-br ${section.gradient} p-4 text-white shadow-lg ${section.shadow}
+              mb-3 md:mb-5 flex h-14 w-14 md:h-20 md:w-20 items-center justify-center rounded-[1.25rem] md:rounded-[2.2rem]
+              bg-gradient-to-br ${section.gradient} p-3.5 md:p-5 text-white shadow-lg ${section.shadow}
             `}>
               <section.icon className="w-full h-full" />
             </div>
 
-            <span className="text-lg md:text-xl font-bold tracking-tight text-text dark:text-text-dark">{section.title}</span>
+            <span className="text-base md:text-xl font-bold tracking-tight text-text dark:text-text-dark text-center">{section.title}</span>
             
             {stats && section.statsKey && stats[section.statsKey] > 0 && (
               <motion.div
-                className="mt-3"
+                className="mt-2 md:mt-4"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.8 + i * 0.1 }}
               >
-                <div className="rounded-full bg-primary/10 dark:bg-primary/20 px-3 py-1 border border-primary/10">
-                  <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-primary dark:text-primary-light">
+                <div className="rounded-full bg-primary/10 dark:bg-primary/20 px-3 py-1 border border-primary/20">
+                  <span className="text-[9px] md:text-xs font-black uppercase tracking-widest text-primary dark:text-primary-light">
                     {stats[section.statsKey]} {section.statsLabel}
                   </span>
                 </div>
