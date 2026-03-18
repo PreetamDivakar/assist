@@ -30,7 +30,7 @@ export default function Events() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all'); // category
-  const [timeFilter, setTimeFilter] = useState('all'); // 'month' or 'all'
+  const [timeFilter, setTimeFilter] = useState('month'); // 'month' or 'all'
   const [currentPage, setCurrentPage] = useState(1);
   const [showAdd, setShowAdd] = useState(false);
   const [editItem, setEditItem] = useState(null);

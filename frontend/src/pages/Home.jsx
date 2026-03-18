@@ -8,15 +8,6 @@ import { Badge } from '../components/UI';
 
 const sections = [
   {
-    title: 'Birthdays',
-    icon: Cake,
-    path: '/birthdays',
-    gradient: 'from-pink-500 to-rose-400',
-    shadow: 'shadow-pink-500/20',
-    statsKey: 'upcoming_birthdays_count',
-    statsLabel: 'upcoming',
-  },
-  {
     title: 'Jiya',
     icon: Heart,
     path: '/jiya',
@@ -33,6 +24,15 @@ const sections = [
     shadow: 'shadow-cyan-500/20',
     statsKey: null,
     statsLabel: '',
+  },
+  {
+    title: 'Birthdays',
+    icon: Cake,
+    path: '/birthdays',
+    gradient: 'from-pink-500 to-rose-400',
+    shadow: 'shadow-pink-500/20',
+    statsKey: 'upcoming_birthdays_count',
+    statsLabel: 'upcoming',
   },
   {
     title: 'Events',
