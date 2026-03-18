@@ -125,8 +125,8 @@ export default function SmartHeader({ stats }) {
             {reminders.map((item, i) => (
               <motion.div
                 key={item.id}
-                whileHover={{ scale: 1.01, y: -2 }}
-                whileTap={{ scale: 0.99 }}
+                whileHover={{ scale: 1.02, y: -2, transition: { duration: 0.1, ease: "easeOut" } }}
+                whileTap={{ scale: 0.99, transition: { duration: 0.05 } }}
                 className={`
                   relative flex items-center gap-3 p-3.5 rounded-[1.5rem]
                   glass dark:glass-dark shadow-sm

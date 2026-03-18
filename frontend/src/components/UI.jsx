@@ -95,8 +95,8 @@ export function FloatingActionButton({ onClick, icon: Icon }) {
     <motion.button
       onClick={onClick}
       className="fixed bottom-8 right-8 z-40 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-white premium-shadow"
-      whileHover={{ scale: 1.05, y: -4 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.05, y: -4, transition: { duration: 0.1, ease: "easeOut" } }}
+      whileTap={{ scale: 0.95, transition: { duration: 0.05 } }}
       transition={{ type: "spring", stiffness: 400, damping: 10 }}
     >
       <Icon size={28} />
@@ -172,8 +172,8 @@ export function Button({ children, variant = 'primary', ...props }) {
   };
   return (
     <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ scale: 1.02, transition: { duration: 0.1, ease: "easeOut" } }}
+      whileTap={{ scale: 0.98, transition: { duration: 0.05 } }}
       className={`rounded-2xl px-6 py-3.5 text-sm font-bold tracking-tight transition-all flex items-center justify-center gap-2 ${styles[variant]} ${props.className || ''}`}
       {...props}
     >

@@ -89,9 +89,9 @@ export default function Home() {
             `}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 + 0.5, type: 'spring', stiffness: 200, damping: 20 }}
-            whileHover={{ scale: 1.02, y: -8 }}
-            whileTap={{ scale: 0.97 }}
+            transition={{ delay: i * 0.05 + 0.3, type: 'spring', stiffness: 200, damping: 20 }}
+            whileHover={{ scale: 1.03, y: -4, transition: { duration: 0.1, ease: "easeOut" } }}
+            whileTap={{ scale: 0.98, transition: { duration: 0.05 } }}
           >
             {/* Background Accent Gradient */}
             <div className={`absolute inset-0 bg-gradient-to-br ${section.gradient} opacity-[0.03] dark:opacity-[0.1] group-hover:opacity-[0.08] dark:group-hover:opacity-[0.15] transition-opacity`} />
