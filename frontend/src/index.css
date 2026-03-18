@@ -12,20 +12,20 @@
   --color-surface: #fbfbfd;
   --color-surface-dark: #000000;
   --color-surface-card: #ffffff;
-  --color-surface-card-dark: #2c2c2e;
+  --color-surface-card-dark: #2d1b4e;
   --color-text: #1d1d1f;
   --color-text-dark: #ffffff;
   --color-text-muted: #86868b;
-  --color-text-muted-dark: #a1a1a6;
+  --color-text-muted-dark: #c1c1c6;
   --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-dark: rgba(255, 255, 255, 0.15);
+  --color-border-dark: rgba(255, 255, 255, 0.2);
   --color-success: #34c759;
   --color-warning: #ff9500;
   --color-danger: #ff3b30;
   --font-sans: 'SF Pro Display', 'Inter', system-ui, -apple-system, sans-serif;
   
   --shadow-premium: 0 10px 40px -10px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.1);
-  --shadow-premium-dark: 0 20px 50px -12px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+  --shadow-premium-dark: 0 20px 50px -12px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 html {
@@ -58,10 +58,11 @@ html {
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 backdrop-blur-xl border border-black/5;
+    @apply bg-slate-50/80 backdrop-blur-xl border border-black/5;
   }
   .glass-dark {
-    @apply bg-white/10 backdrop-blur-xl border border-white/10;
+    background: rgba(45, 27, 78, 0.7);
+    @apply backdrop-blur-xl border border-white/10;
   }
   .inner-glow {
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
