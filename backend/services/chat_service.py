@@ -103,8 +103,8 @@ Rules:
 - Never make up data that isn't in the database"""
 
 
-def ask_ai(context: str, user_message: str, chat_history: list = None) -> str:
-    """Send question to Groq (Llama 3) with database context."""
+def ask_ai(db: Session, context: str, user_message: str, chat_history: list = None) -> str:
+    """Send question to Groq (Llama 3) with database context and write capabilities."""
     from dotenv import load_dotenv
     from pathlib import Path
     
@@ -124,7 +124,76 @@ def ask_ai(context: str, user_message: str, chat_history: list = None) -> str:
         system_content = SYSTEM_PROMPT.format(
             today=date.today().strftime("%A, %B %d, %Y"),
             context=context,
-        )
+        ) + "\n\nYou can also add or update data in the database using the provided tools. If a user asks to remember something, add a note, or record an event, use the appropriate tool."
+
+        # Define tools
+        tools = [
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_note",
+                    "description": "Add a new note to the database.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "person": {"type": "string", "enum": ["jiya", "pree"], "description": "The person this note is for."},
+                            "title": {"type": "string", "description": "Short title of the note."},
+                            "content": {"type": "string", "description": "Full content of the note."}
+                        },
+                        "required": ["person", "title", "content"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_birthday",
+                    "description": "Add a new birthday to the database.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string", "description": "Name of the person."},
+                            "date": {"type": "string", "description": "Date of birth in YYYY-MM-DD format."},
+                            "notes": {"type": "string", "description": "Any additional notes about the birthday."}
+                        },
+                        "required": ["name", "date"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_event",
+                    "description": "Add a new event or reminder to the database.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "title": {"type": "string", "description": "Title of the event."},
+                            "date": {"type": "string", "description": "Date of the event in YYYY-MM-DD format."},
+                            "category": {"type": "string", "enum": ["birthday", "personal", "custom"], "description": "Category of the event."},
+                            "description": {"type": "string", "description": "Description of the event."},
+                            "recurring": {"type": "boolean", "description": "Whether the event repeats annually."}
+                        },
+                        "required": ["title", "date", "category"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_bucket_list_item",
+                    "description": "Add a new item to the bucket list.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "person": {"type": "string", "enum": ["jiya", "pree"], "description": "The person this item is for."},
+                            "title": {"type": "string", "description": "The bucket list item title."}
+                        },
+                        "required": ["person", "title"]
+                    }
+                }
+            }
+        ]
 
         # Build conversation history
         messages = [{"role": "system", "content": system_content}]
@@ -136,17 +205,69 @@ def ask_ai(context: str, user_message: str, chat_history: list = None) -> str:
 
         messages.append({"role": "user", "content": user_message})
 
+        # First AI call
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=messages,
             temperature=0.7,
             max_tokens=1024,
+            tools=tools,
+            tool_choice="auto"
         )
 
+        response_message = response.choices[0].message
+        tool_calls = response_message.tool_calls
+
+        if tool_calls:
+            messages.append(response_message)
+            
+            for tool_call in tool_calls:
+                function_name = tool_call.function.name
+                function_args = json.loads(tool_call.function.arguments)
+                
+                # Execute database operation
+                result = "Success"
+                try:
+                    if function_name == "add_note":
+                        new_item = Note(**function_args)
+                        db.add(new_item)
+                    elif function_name == "add_birthday":
+                        # Convert string date to date object
+                        function_args['date'] = date.fromisoformat(function_args['date'])
+                        new_item = Birthday(**function_args)
+                        db.add(new_item)
+                    elif function_name == "add_event":
+                        function_args['date'] = date.fromisoformat(function_args['date'])
+                        new_item = Event(**function_args)
+                        db.add(new_item)
+                    elif function_name == "add_bucket_list_item":
+                        new_item = BucketListItem(**function_args)
+                        db.add(new_item)
+                    
+                    db.commit()
+                    result = f"Successfully added the {function_name.replace('add_', '')} to the database."
+                except Exception as e:
+                    db.rollback()
+                    result = f"Error: {str(e)}"
+
+                messages.append({
+                    "tool_call_id": tool_call.id,
+                    "role": "tool",
+                    "name": function_name,
+                    "content": result,
+                })
+
+            # Get final AI response after tool results
+            second_response = client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=messages,
+            )
+            return second_response.choices[0].message.content
+
         if not response or not response.choices:
-            return "I'm sorry, I couldn't generate a response for that. It might have been blocked or I ran out of ideas!"
+            return "I'm sorry, I couldn't generate a response for that."
         
-        return response.choices[0].message.content
+        return response_message.content
 
     except Exception as e:
         return f"Sorry, I ran into an error with Groq: {str(e)}"

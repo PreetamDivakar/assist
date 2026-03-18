@@ -20,5 +20,5 @@ class ChatResponse(BaseModel):
 def chat(req: ChatRequest, db: Session = Depends(get_db)):
     """Ask the AI assistant a question. It has full access to the database."""
     context = gather_context(db)
-    reply = ask_ai(context, req.message, req.history)
+    reply = ask_ai(db, context, req.message, req.history)
     return {"reply": reply}
