@@ -95,7 +95,7 @@ const ReminderCarousel = ({ reminders }) => {
               {item.icon}
             </div>
             
-            <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
+            <div className="flex flex-col min-w-0 flex-1 items-start text-left">
               <div className="flex items-center justify-between w-full mb-1">
                 <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${
                   item.urgent ? 'text-accent' : 'text-primary/70 dark:text-primary-light/70'
@@ -108,8 +108,8 @@ const ReminderCarousel = ({ reminders }) => {
                   {item.dayLabel}
                 </span>
               </div>
-              <span className="text-lg md:text-xl font-black text-text dark:text-text-dark leading-none truncate">
-                {item.name}
+              <span className="text-lg md:text-xl font-black text-text dark:text-text-dark leading-none truncate block w-full text-left">
+                {item.name.replace(/'s birthday/i, '').replace(/ birthday/i, '')}
               </span>
             </div>
           </motion.div>

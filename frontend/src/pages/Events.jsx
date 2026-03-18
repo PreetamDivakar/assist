@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Plus, Trash2, Edit, Clock, Star, Tag, Search, CalendarDays } from 'lucide-react';
 import { eventApi } from '../api/client';
 import {
-  EmptyState, SkeletonList, Input, Button, TextArea, Pagination, PageHeader, Badge, FloatingActionButton, Modal, ConfirmDialog
+  EmptyState, SkeletonList, Input, Button, TextArea, Pagination, PageHeader, Badge, FloatingActionButton, Modal, ConfirmDialog, LoadingOverlay
 } from '../components/UI';
 
 const ITEMS_PER_PAGE = 10;
@@ -181,7 +181,7 @@ export default function Events() {
     <div className="min-h-dvh p-4 md:p-6 max-w-2xl mx-auto">
       <PageHeader title="Events & Reminders" onBack={() => navigate('/')}>
         <Button 
-          onClick={() => { setForm({ title: '', date: '', category: 'custom', description: '', recurring: false }); setEditItem(null); setShowAdd(true); }}
+          onClick={() => { setForm({ title: '', date: '', category: 'personal', description: '', recurring: false }); setEditItem(null); setShowAdd(true); }}
           className="rounded-full !p-2 md:!p-2.5 shadow-md"
         >
           <Plus className="w-5 h-5 md:w-6 md:h-6" />
@@ -305,11 +305,13 @@ export default function Events() {
             <input type="checkbox" checked={form.recurring} onChange={(e) => setForm(p => ({ ...p, recurring: e.target.checked }))} className="rounded accent-primary" />
             Recurring yearly
           </label>
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleSave} isLoading={loading}>Save</Button>
         </div>
       </Modal>
 
       <ConfirmDialog isOpen={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={handleDelete} title="Delete Event" message="Are you sure?" />
+      
+      <LoadingOverlay isActive={loading} message={editItem ? "Updating..." : "Creating..."} />
     </div>
   );
 }

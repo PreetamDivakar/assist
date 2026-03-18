@@ -39,6 +39,7 @@ export default function App() {
 
   return (
     <HashRouter>
+      <div className="fixed inset-0 -z-10 bg-[#000000] dark:bg-[radial-gradient(circle_at_top_left,#1a1a1a_0%,#000000_100%)]" />
       <AnimatedRoutes />
     </HashRouter>
   );

@@ -36,6 +36,9 @@ html {
   * {
     @apply box-border;
   }
+  html, body {
+    background-color: #000000;
+  }
   body {
     font-family: var(--font-sans);
     @apply m-0 p-0 antialiased;
@@ -45,12 +48,12 @@ html {
     overflow-x: hidden;
   }
   body.light {
-    @apply bg-surface text-text;
+    background-color: var(--color-surface);
+    @apply text-text;
     color-scheme: light;
   }
   body.dark {
-    background: radial-gradient(circle at top left, #1a1a1a 0%, #000000 100%);
-    background-attachment: fixed;
+    background: #000000;
     @apply text-text-dark;
     color-scheme: dark;
   }
