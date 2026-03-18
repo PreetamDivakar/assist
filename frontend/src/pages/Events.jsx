@@ -127,46 +127,43 @@ export default function Events() {
         <h3 className="mb-3 text-sm font-semibold text-text-muted dark:text-text-muted-dark">
           {emoji} {title}
         </h3>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           {items.map((e, i) => (
             <motion.div
               key={`${e.id}-${e.title}-${i}`}
-              className={`group rounded-2xl border p-4 transition-all ${statusColors[e.status] || statusColors.future}`}
-              initial={{ opacity: 0, y: 10 }}
+              className="group rounded-3xl glass dark:glass-dark p-5 shadow-sm premium-shadow"
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04 }}
             >
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex-1 shrink min-w-0">
-                  <div className="flex items-center gap-1.5 md:gap-2 flex-wrap">
-                    <span className="text-sm md:text-base font-semibold truncate">{e.title}</span>
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex-1 min-w-0 px-1">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="text-base font-bold tracking-tight">{e.title}</span>
                     {e.isAutoReminder && <Badge variant="accent">auto</Badge>}
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${categoryColors[e.category]?.bg} ${categoryColors[e.category]?.text} shrink-0`}>
-                      {categoryColors[e.category]?.label}
-                    </span>
                   </div>
-                  <p className="mt-0.5 text-xs md:text-sm text-text-muted dark:text-text-muted-dark truncate">
+                  <p className="text-sm font-medium text-text-muted mb-2">
                     {new Date(e.date).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' })}
                   </p>
-                  {e.description && <p className="mt-1 text-xs text-text-muted dark:text-text-muted-dark line-clamp-2 md:line-clamp-none">{e.description}</p>}
+                  {e.description && <p className="text-xs text-text-muted dark:text-text-muted-dark leading-relaxed">{e.description}</p>}
                 </div>
-                <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                <div className="flex items-center gap-4 shrink-0">
                   <div className="text-right">
                     {e.status === 'today' ? (
-                      <span className="text-base md:text-lg font-bold text-success">Today!</span>
+                      <span className="text-lg font-black text-success">Today!</span>
                     ) : e.status === 'tomorrow' ? (
-                      <span className="text-base md:text-lg font-bold text-warning">Tomorrow</span>
+                      <span className="text-lg font-black text-warning">Tomorrow</span>
                     ) : (
-                      <>
-                        <span className="text-xl md:text-2xl font-bold text-primary">{e.days_remaining}</span>
-                        <p className="text-[10px] md:text-xs text-text-muted dark:text-text-muted-dark">days</p>
-                      </>
+                      <div className="flex flex-col items-end">
+                        <span className="text-2xl font-black text-primary">{e.days_remaining}</span>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted">days</p>
+                      </div>
                     )}
                   </div>
                   {!e.isAutoReminder && (
-                    <div className="flex flex-col gap-1 opacity-100 md:opacity-0 transition-opacity group-hover:opacity-100">
-                      <button onClick={() => openEdit(e)} className="rounded-lg p-1 hover:bg-primary/10"><Edit className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
-                      <button onClick={() => setDeleteId(e.id)} className="rounded-lg p-1 hover:bg-danger/10 text-danger"><Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
+                    <div className="flex flex-col gap-2 opacity-100 md:opacity-0 transition-opacity group-hover:opacity-100">
+                      <button onClick={() => openEdit(e)} className="rounded-xl p-2 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20"><Edit className="w-4 h-4" /></button>
+                      <button onClick={() => setDeleteId(e.id)} className="rounded-xl p-2 bg-danger/10 text-danger hover:bg-danger/20"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   )}
                 </div>
@@ -190,19 +187,19 @@ export default function Events() {
       </PageHeader>
 
       {/* Search */}
-      <div className="relative mb-4 md:mb-6">
-        <Search className="absolute left-3 top-1/2 w-4 h-4 md:w-5 md:h-5 -translate-y-1/2 text-text-muted dark:text-text-muted-dark" />
+      <div className="relative mb-6">
+        <Search className="absolute left-4 top-1/2 w-5 h-5 -translate-y-1/2 text-text-muted" />
         <input
           type="text"
           placeholder="Search events & reminders..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-2xl border border-border bg-surface-card py-2.5 md:py-3 pl-9 md:pl-10 pr-4 text-sm md:text-base outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-border-dark dark:bg-surface-card-dark dark:text-text-dark"
+          className="w-full rounded-2xl glass dark:glass-dark py-4 pl-12 pr-4 text-base outline-none transition-all focus:ring-4 focus:ring-primary/10 dark:text-text-dark"
         />
       </div>
 
       {/* Category filters */}
-      <div className="mb-6 flex gap-2 overflow-x-auto pb-1">
+      <div className="mb-6 flex gap-3 overflow-x-auto pb-2 no-scrollbar">
         {[
           { id: 'all', label: '📋 All' },
           { id: 'birthday', label: '🎂 Birthdays' },
@@ -212,10 +209,10 @@ export default function Events() {
           <button
             key={f.id}
             onClick={() => setFilter(f.id)}
-            className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+            className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-bold transition-all border ${
               filter === f.id
-                ? 'bg-gradient-to-r from-primary to-accent text-white shadow-md'
-                : 'bg-surface-card text-text-muted hover:bg-primary/10 dark:bg-surface-card-dark dark:text-text-muted-dark'
+                ? 'bg-primary border-primary text-white shadow-md'
+                : 'glass dark:glass-dark text-text-muted border-white/20 hover:bg-black/5 dark:hover:bg-white/5'
             }`}
           >
             {f.label}
@@ -223,13 +220,13 @@ export default function Events() {
         ))}
       </div>
 
-      <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex gap-1 rounded-xl bg-surface-card p-1 dark:bg-surface-card-dark w-fit">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex gap-1 rounded-2xl glass dark:glass-dark p-1 shadow-sm w-fit">
           <button
             onClick={() => setTimeFilter('month')}
-            className={`rounded-lg px-3 py-1.5 text-xs md:text-sm font-medium transition-all ${
+            className={`rounded-xl px-4 py-2 text-sm font-bold transition-all ${
               timeFilter === 'month'
-                ? 'bg-gradient-to-r from-primary to-accent text-white shadow'
+                ? 'bg-white dark:bg-white/10 shadow-sm text-primary dark:text-white'
                 : 'text-text-muted hover:text-text dark:text-text-muted-dark'
             }`}
           >
@@ -237,9 +234,9 @@ export default function Events() {
           </button>
           <button
             onClick={() => setTimeFilter('all')}
-            className={`rounded-lg px-3 py-1.5 text-xs md:text-sm font-medium transition-all ${
+            className={`rounded-xl px-4 py-2 text-sm font-bold transition-all ${
               timeFilter === 'all'
-                ? 'bg-gradient-to-r from-primary to-accent text-white shadow'
+                ? 'bg-white dark:bg-white/10 shadow-sm text-primary dark:text-white'
                 : 'text-text-muted hover:text-text dark:text-text-muted-dark'
             }`}
           >

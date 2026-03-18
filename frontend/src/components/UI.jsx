@@ -6,28 +6,29 @@ export function Modal({ isOpen, onClose, title, children }) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6"
+          className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={onClose} />
           <motion.div
-            className="relative flex flex-col w-[calc(100%-1rem)] max-w-md max-h-[85vh] md:max-h-[90vh] rounded-2xl md:rounded-3xl bg-surface-card p-4 md:p-6 shadow-2xl dark:bg-surface-card-dark"
-            initial={{ scale: 0.9, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.9, y: 20 }}
+            className="relative flex flex-col w-full md:max-w-md max-h-[90vh] rounded-t-[2.5rem] md:rounded-[2.5rem] bg-surface-card p-6 md:p-8 shadow-2xl dark:bg-surface-card-dark border-t border-x md:border border-white/20"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
           >
-            <div className="mb-3 md:mb-4 flex items-center justify-between shrink-0">
-              <h3 className="text-base md:text-lg font-semibold">{title}</h3>
+            <div className="mb-6 flex items-center justify-between shrink-0">
+              <h3 className="text-xl font-bold tracking-tight">{title}</h3>
               <button
                 onClick={onClose}
-                className="rounded-full p-1 transition-colors hover:bg-primary/10"
+                className="rounded-full p-2 transition-colors bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20"
               >
-                <X className="w-5 h-5 md:w-6 md:h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="overflow-y-auto pr-1 custom-scrollbar">
+            <div className="overflow-y-auto pr-1 custom-scrollbar pb-6">
               {children}
             </div>
           </motion.div>
@@ -93,11 +94,12 @@ export function FloatingActionButton({ onClick, icon: Icon }) {
   return (
     <motion.button
       onClick={onClick}
-      className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-primary to-accent shadow-lg shadow-primary/30"
-      whileHover={{ scale: 1.1 }}
+      className="fixed bottom-8 right-8 z-40 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-white premium-shadow"
+      whileHover={{ scale: 1.05, y: -4 }}
       whileTap={{ scale: 0.95 }}
+      transition={{ type: "spring", stiffness: 400, damping: 10 }}
     >
-      <Icon size={24} className="text-white" />
+      <Icon size={28} />
     </motion.button>
   );
 }
@@ -124,14 +126,14 @@ export function PageHeader({ title, onBack, children }) {
 
 export function Badge({ children, variant = 'default' }) {
   const colors = {
-    default: 'bg-primary/10 text-primary',
-    success: 'bg-success/10 text-success',
-    warning: 'bg-warning/10 text-warning',
-    danger: 'bg-danger/10 text-danger',
-    accent: 'bg-accent/10 text-accent',
+    default: 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light border-primary/10',
+    success: 'bg-success/10 text-success dark:bg-success/20 dark:text-success border-success/10',
+    warning: 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning border-warning/10',
+    danger: 'bg-danger/10 text-danger dark:bg-danger/20 dark:text-danger border-danger/10',
+    accent: 'bg-accent/10 text-accent dark:bg-accent/20 dark:text-accent border-accent/10',
   };
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${colors[variant]}`}>
+    <span className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] md:text-xs font-bold uppercase tracking-wider border ${colors[variant]}`}>
       {children}
     </span>
   );
@@ -139,11 +141,11 @@ export function Badge({ children, variant = 'default' }) {
 
 export function Input({ label, ...props }) {
   return (
-    <div className="flex flex-col gap-1">
-      {label && <label className="text-xs md:text-sm font-medium text-text-muted dark:text-text-muted-dark">{label}</label>}
+    <div className="flex flex-col gap-1.5">
+      {label && <label className="text-xs font-bold uppercase tracking-widest text-text-muted dark:text-text-muted-dark px-1">{label}</label>}
       <input
         {...props}
-        className={`rounded-xl border border-border bg-surface-card px-3.5 py-2.5 md:px-4.5 md:py-3 text-sm md:text-base outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-border-dark dark:bg-surface-card-dark dark:text-text-dark ${props.className || ''}`}
+        className={`rounded-2xl border border-border bg-black/5 dark:bg-white/5 px-4 py-3 text-base outline-none transition-all focus:bg-white dark:focus:bg-black focus:ring-4 focus:ring-primary/10 dark:text-text-dark ${props.className || ''}`}
       />
     </div>
   );
@@ -151,11 +153,11 @@ export function Input({ label, ...props }) {
 
 export function TextArea({ label, ...props }) {
   return (
-    <div className="flex flex-col gap-1">
-      {label && <label className="text-xs md:text-sm font-medium text-text-muted dark:text-text-muted-dark">{label}</label>}
+    <div className="flex flex-col gap-1.5">
+      {label && <label className="text-xs font-bold uppercase tracking-widest text-text-muted dark:text-text-muted-dark px-1">{label}</label>}
       <textarea
         {...props}
-        className={`rounded-xl border border-border bg-surface-card px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-border-dark dark:bg-surface-card-dark dark:text-text-dark resize-none ${props.className || ''}`}
+        className={`rounded-2xl border border-border bg-black/5 dark:bg-white/5 px-4 py-3 text-base outline-none transition-all focus:bg-white dark:focus:bg-black focus:ring-4 focus:ring-primary/10 dark:text-text-dark resize-none ${props.className || ''}`}
       />
     </div>
   );
@@ -163,16 +165,16 @@ export function TextArea({ label, ...props }) {
 
 export function Button({ children, variant = 'primary', ...props }) {
   const styles = {
-    primary: 'bg-gradient-to-r from-primary to-accent text-white shadow-lg shadow-primary/20 hover:shadow-primary/40',
-    secondary: 'bg-primary/10 text-primary hover:bg-primary/20',
-    ghost: 'hover:bg-primary/10',
+    primary: 'bg-primary text-white premium-shadow',
+    secondary: 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light hover:bg-primary/20 dark:hover:bg-primary/30',
+    ghost: 'hover:bg-black/5 dark:hover:bg-white/5',
     danger: 'bg-danger/10 text-danger hover:bg-danger/20',
   };
   return (
     <motion.button
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className={`rounded-xl px-4.5 py-2.5 md:py-3 text-sm md:text-base font-medium transition-all ${styles[variant]} ${props.className || ''}`}
+      className={`rounded-2xl px-6 py-3.5 text-sm font-bold tracking-tight transition-all flex items-center justify-center gap-2 ${styles[variant]} ${props.className || ''}`}
       {...props}
     >
       {children}

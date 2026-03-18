@@ -81,25 +81,25 @@ export default function Birthdays() {
       </PageHeader>
 
       {/* Search */}
-      <div className="relative mb-4 md:mb-6">
-        <Search className="absolute left-3 top-1/2 w-4 h-4 md:w-5 md:h-5 -translate-y-1/2 text-text-muted dark:text-text-muted-dark" />
+      <div className="relative mb-6">
+        <Search className="absolute left-4 top-1/2 w-5 h-5 -translate-y-1/2 text-text-muted" />
         <input
           type="text"
           placeholder="Search birthdays..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-2xl border border-border bg-surface-card py-2.5 md:py-3 pl-9 md:pl-10 pr-4 text-sm md:text-base outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-border-dark dark:bg-surface-card-dark dark:text-text-dark"
+          className="w-full rounded-2xl glass dark:glass-dark py-4 pl-12 pr-4 text-base outline-none transition-all focus:ring-4 focus:ring-primary/10 dark:text-text-dark"
         />
       </div>
 
       {!search && (
-        <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex gap-1 rounded-xl bg-surface-card p-1 dark:bg-surface-card-dark w-fit">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex gap-1 rounded-2xl glass dark:glass-dark p-1 shadow-sm w-fit">
             <button
               onClick={() => setFilter('month')}
-              className={`rounded-lg px-3 py-1.5 text-xs md:text-sm font-medium transition-all ${
+              className={`rounded-xl px-4 py-2 text-sm font-bold transition-all ${
                 filter === 'month'
-                  ? 'bg-gradient-to-r from-primary to-accent text-white shadow'
+                  ? 'bg-white dark:bg-white/10 shadow-sm text-primary dark:text-white'
                   : 'text-text-muted hover:text-text dark:text-text-muted-dark'
               }`}
             >
@@ -107,9 +107,9 @@ export default function Birthdays() {
             </button>
             <button
               onClick={() => setFilter('all')}
-              className={`rounded-lg px-3 py-1.5 text-xs md:text-sm font-medium transition-all ${
+              className={`rounded-xl px-4 py-2 text-sm font-bold transition-all ${
                 filter === 'all'
-                  ? 'bg-gradient-to-r from-primary to-accent text-white shadow'
+                  ? 'bg-white dark:bg-white/10 shadow-sm text-primary dark:text-white'
                   : 'text-text-muted hover:text-text dark:text-text-muted-dark'
               }`}
             >
@@ -136,45 +136,45 @@ export default function Birthdays() {
               {birthdays.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map((b, i) => (
                 <motion.div
                   key={b.id}
-                  className={`group relative rounded-2xl border p-4 transition-all ${
-                    b.is_upcoming
-                      ? 'border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5 shadow-lg shadow-accent/10'
-                      : 'border-border bg-surface-card dark:border-border-dark dark:bg-surface-card-dark'
+                  className={`group relative rounded-3xl p-5 transition-all glass dark:glass-dark premium-shadow ${
+                    b.is_upcoming ? 'ring-2 ring-accent/20' : ''
                   }`}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
                   transition={{ delay: i * 0.05 }}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex-1 shrink min-w-0">
-                      <div className="flex items-center gap-1.5 md:gap-2 flex-wrap">
-                        <span className="text-sm md:text-base font-semibold truncate">{b.name}</span>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="text-lg font-bold tracking-tight">{b.name}</span>
                         {b.is_upcoming && <Badge variant="warning">🔥 Upcoming!</Badge>}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-text-muted">
+                          {new Date(b.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
+                        </span>
                         {b.reminder_enabled ? (
-                          <Bell className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary-light shrink-0" />
+                          <Bell className="w-4 h-4 text-primary" />
                         ) : (
-                          <BellOff className="w-3.5 h-3.5 md:w-4 md:h-4 text-text-muted dark:text-text-muted-dark shrink-0" />
+                          <BellOff className="w-4 h-4 text-text-muted opacity-40" />
                         )}
                       </div>
-                      <p className="mt-0.5 text-xs md:text-sm text-text-muted dark:text-text-muted-dark truncate">
-                        {new Date(b.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
-                      </p>
-                      {b.notes && <p className="mt-1 text-xs text-text-muted dark:text-text-muted-dark line-clamp-2 md:line-clamp-none">{b.notes}</p>}
+                      {b.notes && <p className="mt-2 text-sm text-text-muted dark:text-text-muted-dark leading-relaxed">{b.notes}</p>}
                     </div>
-                    <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                    <div className="flex items-center gap-4 shrink-0">
                       <div className="text-right">
-                        <span className={`text-xl md:text-2xl font-bold ${b.days_remaining <= 3 ? 'text-accent' : 'text-primary'}`}>
+                        <span className={`text-3xl font-black ${b.days_remaining <= 3 ? 'text-danger' : 'text-primary'}`}>
                           {b.days_remaining}
                         </span>
-                        <p className="text-[10px] md:text-xs text-text-muted dark:text-text-muted-dark">days left</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted">days left</p>
                       </div>
-                      <div className="flex flex-col gap-1 opacity-100 md:opacity-0 transition-opacity group-hover:opacity-100">
-                        <button onClick={() => openEdit(b)} className="rounded-lg p-1 hover:bg-primary/10">
-                          <Edit className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                      <div className="flex flex-col gap-2 opacity-100 md:opacity-0 transition-opacity group-hover:opacity-100">
+                        <button onClick={() => openEdit(b)} className="rounded-xl p-2 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20">
+                          <Edit className="w-4 h-4" />
                         </button>
-                        <button onClick={() => setDeleteId(b.id)} className="rounded-lg p-1 hover:bg-danger/10 text-danger">
-                          <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        <button onClick={() => setDeleteId(b.id)} className="rounded-xl p-2 bg-danger/10 text-danger hover:bg-danger/20">
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>

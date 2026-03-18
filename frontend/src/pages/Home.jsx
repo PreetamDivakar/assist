@@ -58,14 +58,14 @@ export default function Home() {
   return (
     <div className="relative flex min-h-dvh flex-col items-center justify-center p-4 overflow-hidden">
       {/* BG Glow orbs */}
-      <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
+      <div className="pointer-events-none absolute -top-[10%] -left-[10%] h-[60%] w-[60%] rounded-full bg-primary/10 blur-[120px]" />
+      <div className="pointer-events-none absolute -bottom-[10%] -right-[10%] h-[60%] w-[60%] rounded-full bg-accent/10 blur-[120px]" />
 
       {/* Top-right controls */}
-      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+      <div className="absolute top-8 right-8 z-20">
         <motion.button
           onClick={toggleTheme}
-          className="rounded-full p-3 backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/20"
+          className="rounded-full p-3.5 glass dark:glass-dark shadow-sm border border-white/20"
           whileHover={{ scale: 1.1, rotate: 15 }}
           whileTap={{ scale: 0.9 }}
         >
@@ -77,36 +77,46 @@ export default function Home() {
       <SmartHeader stats={stats} />
 
       {/* 2×2 Grid */}
-      <div className="grid grid-cols-2 gap-3 md:gap-6" style={{ width: 'min(100vw - 2rem, 100vh - 18rem, 36rem)', height: 'min(100vw - 2rem, 100vh - 18rem, 36rem)' }}>
+      <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-2xl w-full px-4 mb-8">
         {sections.map((section, i) => (
           <motion.div
             key={section.path}
             onClick={() => navigate(section.path)}
-            className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl md:rounded-3xl bg-gradient-to-br ${section.gradient} p-2 md:p-4 shadow-xl ${section.shadow} overflow-hidden`}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.1, type: 'spring', stiffness: 200 }}
-            whileHover={{ scale: 1.04, y: -4 }}
+            className={`
+              group relative flex cursor-pointer flex-col items-center justify-center 
+              aspect-square rounded-[2.5rem] md:rounded-[3rem] p-4 md:p-8 
+              glass dark:glass-dark premium-shadow overflow-hidden
+            `}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 + 0.5, type: 'spring', stiffness: 200, damping: 20 }}
+            whileHover={{ scale: 1.02, y: -8 }}
             whileTap={{ scale: 0.97 }}
           >
-            {/* Glass highlight */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+            {/* Background Accent Gradient */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${section.gradient} opacity-[0.03] dark:opacity-[0.1] group-hover:opacity-[0.08] dark:group-hover:opacity-[0.15] transition-opacity`} />
             
-            <section.icon className="mb-2 md:mb-3 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-white drop-shadow-lg" />
-            <span className="text-base md:text-lg lg:text-xl font-bold text-white drop-shadow">{section.title}</span>
+            <div className={`
+              mb-4 flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-[1.5rem] md:rounded-[2rem]
+              bg-gradient-to-br ${section.gradient} p-4 text-white shadow-lg ${section.shadow}
+            `}>
+              <section.icon className="w-full h-full" />
+            </div>
+
+            <span className="text-lg md:text-xl font-bold tracking-tight text-text dark:text-text-dark">{section.title}</span>
             
             {stats && section.statsKey && stats[section.statsKey] > 0 && (
               <motion.div
-                className="mt-2"
+                className="mt-3"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.5 + i * 0.1 }}
+                transition={{ delay: 0.8 + i * 0.1 }}
               >
-                <Badge variant="default">
-                  <span className="text-white font-semibold bg-white/25 px-2 py-0.5 rounded-full text-xs">
+                <div className="rounded-full bg-primary/10 dark:bg-primary/20 px-3 py-1 border border-primary/10">
+                  <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-primary dark:text-primary-light">
                     {stats[section.statsKey]} {section.statsLabel}
                   </span>
-                </Badge>
+                </div>
               </motion.div>
             )}
           </motion.div>
@@ -116,14 +126,23 @@ export default function Home() {
       {/* Dashboard footer stats */}
       {stats && (
         <motion.div
-          className="mt-4 flex flex-wrap items-center justify-center gap-3 md:gap-6 text-xs md:text-sm text-text-muted dark:text-text-muted-dark"
+          className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 1 }}
         >
-          <span>🎂 {stats.upcoming_birthdays_count} birthdays soon</span>
-          <span>📅 {stats.today_events_count} today</span>
-          <span>✅ {stats.bucket_list_completed}/{stats.bucket_list_total} bucket list</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🎂</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-text-muted">{stats.upcoming_birthdays_count} Birthdays</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">📅</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-text-muted">{stats.today_events_count} Today</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">✅</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-text-muted">{stats.bucket_list_completed}/{stats.bucket_list_total} Bucket</span>
+          </div>
         </motion.div>
       )}
     </div>

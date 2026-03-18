@@ -84,7 +84,7 @@ export default function SmartHeader({ stats }) {
       <div className="px-4">
         {/* Date Subtitle */}
         <motion.p
-          className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-bold text-primary/60 dark:text-primary-light/50 mb-1"
+          className="text-xs md:text-sm uppercase tracking-[0.3em] font-bold text-text-muted dark:text-text-muted-dark mb-2 px-1"
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -94,7 +94,7 @@ export default function SmartHeader({ stats }) {
 
         {/* Dynamic Greeting */}
         <motion.h1
-          className="text-2xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-6 flex flex-wrap items-baseline gap-x-3"
+          className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8 flex flex-wrap items-baseline gap-x-4"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
@@ -102,10 +102,11 @@ export default function SmartHeader({ stats }) {
           <span className="text-text dark:text-text-dark">
             {greeting},
           </span>
-          <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent italic">
-            Preetam!
+          <br className="md:hidden" />
+          <span className="text-primary">
+            Preetam
           </span>
-          <span className="text-xl md:text-3xl lg:text-4xl align-middle">✨</span>
+          <span className="text-2xl md:text-4xl lg:text-5xl align-middle ml-1">✨</span>
         </motion.h1>
 
         {/* "Funky" Glassmorphic Reminders */}
@@ -120,44 +121,38 @@ export default function SmartHeader({ stats }) {
              </span>
            </motion.div>
         ) : reminders.length > 0 ? (
-          <div className="flex flex-wrap gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {reminders.map((item, i) => (
               <motion.div
                 key={item.id}
-                whileHover={{ scale: 1.02, y: -2 }}
+                whileHover={{ scale: 1.02, y: -4 }}
                 whileTap={{ scale: 0.98 }}
                 className={`
-                  relative flex items-center gap-3 px-4 py-3 rounded-2xl
-                  backdrop-blur-xl border-t border-l border-white/20
-                  shadow-[0_8px_32px_0_rgba(0,0,0,0.05)]
+                  relative flex items-center gap-4 p-5 rounded-[2rem]
+                  glass dark:glass-dark shadow-sm
                   transition-all cursor-default overflow-hidden group
-                  ${item.urgent 
-                    ? 'bg-accent/10 dark:bg-accent/20 border-accent/20' 
-                    : 'bg-white/40 dark:bg-white/5 border-white/30 dark:border-white/10'}
+                  ${item.urgent ? 'ring-2 ring-accent/20' : ''}
                 `}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 + i * 0.1, type: "spring", stiffness: 100 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 + i * 0.1, type: "spring", stiffness: 100 }}
               >
-                {/* Background Shimmer Effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                
                 <div className={`
-                  flex items-center justify-center w-8 h-8 rounded-full text-base
+                  flex items-center justify-center w-12 h-12 rounded-2xl text-xl
                   ${item.urgent 
-                    ? 'bg-accent/20 text-accent animate-pulse' 
-                    : 'bg-primary/10 text-primary dark:bg-primary/30 dark:text-primary-light'}
+                    ? 'bg-danger/10 text-danger animate-pulse' 
+                    : 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light'}
                 `}>
                   {item.icon}
                 </div>
                 
-                <div className="flex flex-col">
-                  <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider opacity-60 mb-0.5 ${
-                    item.urgent ? 'text-accent' : 'text-primary dark:text-primary-light'
+                <div className="flex flex-col min-w-0">
+                  <span className={`text-[10px] font-black uppercase tracking-widest mb-1 ${
+                    item.urgent ? 'text-danger' : 'text-primary dark:text-primary-light'
                   }`}>
                     {item.type}
                   </span>
-                  <span className="text-sm md:text-base font-semibold text-text dark:text-text-dark leading-tight">
+                  <span className="text-base font-bold text-text dark:text-text-dark leading-tight truncate">
                     {item.text}
                   </span>
                 </div>

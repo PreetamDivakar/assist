@@ -30,19 +30,19 @@ export default function Pree() {
         )}
       </PageHeader>
 
-      {/* Tabs */}
-      <div className="mb-4 md:mb-6 flex gap-1 rounded-2xl bg-surface-card p-1 dark:bg-surface-card-dark">
+      {/* Tabs - Segmented Control Style */}
+      <div className="mb-8 flex gap-1 rounded-2xl glass dark:glass-dark p-1.5 shadow-sm">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex flex-1 items-center justify-center gap-1.5 md:gap-2 rounded-xl py-2 md:py-2.5 text-xs md:text-sm font-medium transition-all ${
+            className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
               activeTab === tab.id
-                ? 'bg-gradient-to-r from-primary to-accent text-white shadow-md'
-                : 'text-text-muted hover:text-text dark:text-text-muted-dark'
+                ? 'bg-white dark:bg-white/10 shadow-sm text-primary dark:text-white'
+                : 'text-text-muted hover:text-text dark:text-text-muted-dark hover:bg-black/5 dark:hover:bg-white/5'
             }`}
           >
-            <tab.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            <tab.icon className="w-4 h-4" />
             {tab.label}
           </button>
         ))}
@@ -120,14 +120,14 @@ function DetailsTab() {
 
   const renderSection = (title, section, icon) => (
     <motion.div
-      className="rounded-2xl border border-border bg-surface-card p-3 md:p-4 dark:border-border-dark dark:bg-surface-card-dark"
+      className="rounded-[2.5rem] glass dark:glass-dark p-6 md:p-8 premium-shadow mb-4"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <h3 className="mb-2 md:mb-3 flex items-center gap-2 text-xs md:text-sm font-semibold text-primary">
-        {icon} {title}
+      <h3 className="mb-6 flex items-center gap-3 text-xs font-black uppercase tracking-widest text-primary px-1">
+        <span className="text-xl">{icon}</span> {title}
       </h3>
-      <div className="grid gap-2">
+      <div className="grid gap-3 px-1">
         {FIELD_MAP[section].map(({ key, label }) => {
           const val = form[section]?.[key];
           return (
@@ -213,27 +213,27 @@ function NotesTab({ triggerAdd }) {
         <EmptyState icon={FileText} title="No notes yet" description="Add notes about Pree" />
       ) : (
         <>
-          <div className="flex flex-col gap-3">
-                  {notes.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map((n, i) => (
-                    <motion.div
-                      key={n.id}
-                      className="group rounded-2xl border border-border bg-surface-card p-3 md:p-4 dark:border-border-dark dark:bg-surface-card-dark"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-sm md:text-base font-semibold truncate">{n.title}</h4>
-                          <p className="mt-1 text-xs md:text-sm text-text-muted dark:text-text-muted-dark whitespace-pre-wrap line-clamp-4">{n.content}</p>
-                        </div>
-                        <div className="flex gap-1 opacity-100 md:opacity-0 transition-opacity group-hover:opacity-100 shrink-0">
-                          <button onClick={() => { setEditNote(n); setNoteForm({ title: n.title, content: n.content }); setShowAddNote(true); }} className="rounded-lg p-1 hover:bg-primary/10"><Edit className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
-                          <button onClick={() => setDeleteNoteId(n.id)} className="rounded-lg p-1 hover:bg-danger/10 text-danger"><Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" /></button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
+          <div className="flex flex-col gap-4">
+            {notes.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map((n, i) => (
+              <motion.div
+                key={n.id}
+                className="group rounded-3xl glass dark:glass-dark p-5 md:p-6 shadow-sm border border-white/10"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0 px-1">
+                    <h4 className="text-lg font-bold tracking-tight mb-2">{n.title}</h4>
+                    <p className="text-sm leading-relaxed text-text-muted dark:text-text-muted-dark whitespace-pre-wrap">{n.content}</p>
+                  </div>
+                  <div className="flex gap-2 opacity-100 md:opacity-0 transition-opacity group-hover:opacity-100 shrink-0">
+                    <button onClick={() => { setEditNote(n); setNoteForm({ title: n.title, content: n.content }); setShowAddNote(true); }} className="rounded-xl p-2 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => setDeleteNoteId(n.id)} className="rounded-xl p-2 bg-danger/10 text-danger hover:bg-danger/20"><Trash2 className="w-4 h-4" /></button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
           <Pagination
             currentPage={currentPage}
