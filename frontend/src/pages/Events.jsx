@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CalendarDays, Plus, Trash2, Edit, Clock, Star, Tag, Search } from 'lucide-react';
+import { Calendar, Plus, Trash2, Edit, Clock, Star, Tag, Search } from 'lucide-react';
 import { eventApi } from '../api/client';
 import {
   EmptyState, SkeletonList, Input, Button, TextArea, Pagination, PageHeader, Badge, FloatingActionButton, Modal, ConfirmDialog
@@ -10,9 +10,8 @@ import {
 const ITEMS_PER_PAGE = 10;
 
 const categoryColors = {
-  birthday: { bg: 'bg-pink-500/10', text: 'text-pink-500', label: '🎂 Birthday' },
   personal: { bg: 'bg-violet-500/10', text: 'text-violet-500', label: '💜 Personal' },
-  custom: { bg: 'bg-amber-500/10', text: 'text-amber-500', label: '⭐ Custom' },
+  work: { bg: 'bg-cyan-500/10', text: 'text-cyan-500', label: '💼 Work' },
 };
 
 const statusColors = {
@@ -30,12 +29,12 @@ export default function Events() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all'); // category
-  const [timeFilter, setTimeFilter] = useState('month'); // 'month' or 'all'
+  const [timeFilter, setTimeFilter] = useState('week'); // 'week' or 'all'
   const [currentPage, setCurrentPage] = useState(1);
   const [showAdd, setShowAdd] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-  const [form, setForm] = useState({ title: '', date: '', category: 'custom', description: '', recurring: false });
+  const [form, setForm] = useState({ title: '', date: '', category: 'personal', description: '', recurring: false });
 
   const load = async () => {
     setLoading(true);
@@ -68,10 +67,7 @@ export default function Events() {
   
   const timeFiltered = timeFilter === 'all' 
     ? categoryFiltered 
-    : categoryFiltered.filter(e => {
-        const d = new Date(e.date);
-        return d.getMonth() === currentMonthIdx && d.getFullYear() === currentYear;
-      });
+    : categoryFiltered.filter(e => e.days_remaining <= 7);
 
   const searchFiltered = search 
     ? timeFiltered.filter(e => 
@@ -84,15 +80,22 @@ export default function Events() {
 
   const handleSave = async () => {
     if (!form.title || !form.date) return;
-    if (editItem) {
-      await eventApi.update(editItem.id, form);
-    } else {
-      await eventApi.create(form);
+    setLoading(true);
+    try {
+      if (editItem) {
+        await eventApi.update(editItem.id, form);
+      } else {
+        await eventApi.create(form);
+      }
+      setShowAdd(false);
+      setEditItem(null);
+      setForm({ title: '', date: '', category: 'personal', description: '', recurring: false });
+      await load();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
-    setShowAdd(false);
-    setEditItem(null);
-    setForm({ title: '', date: '', category: 'custom', description: '', recurring: false });
-    load();
   };
 
   const handleDelete = async () => {
@@ -130,11 +133,10 @@ export default function Events() {
         <div className="flex flex-col gap-3">
           {items.map((e, i) => (
             <motion.div
-              key={`${e.id}-${e.title}-${i}`}
-              className="group rounded-3xl glass dark:glass-dark p-5 shadow-sm premium-shadow"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.04 }}
+              key={e.id}
+              className="group rounded-3xl glass dark:glass-dark p-4 md:p-6 shadow-sm border border-white/10 overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
             >
               <div className="flex items-center justify-between gap-4">
                 <div className="flex-1 min-w-0 px-1">
@@ -202,9 +204,8 @@ export default function Events() {
       <div className="mb-6 flex gap-3 overflow-x-auto pb-2 no-scrollbar">
         {[
           { id: 'all', label: '📋 All' },
-          { id: 'birthday', label: '🎂 Birthdays' },
           { id: 'personal', label: '💜 Personal' },
-          { id: 'custom', label: '⭐ Custom' },
+          { id: 'work', label: '💼 Work' },
         ].map((f) => (
           <button
             key={f.id}
@@ -223,14 +224,14 @@ export default function Events() {
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex gap-1 rounded-2xl glass dark:glass-dark p-1 shadow-sm w-fit">
           <button
-            onClick={() => setTimeFilter('month')}
+            onClick={() => setTimeFilter('week')}
             className={`rounded-xl px-4 py-2 text-sm font-bold transition-all ${
-              timeFilter === 'month'
+              timeFilter === 'week'
                 ? 'bg-white dark:bg-white/10 shadow-sm text-primary dark:text-white'
                 : 'text-text-muted hover:text-text dark:text-text-muted-dark'
             }`}
           >
-            This Month
+            This Week
           </button>
           <button
             onClick={() => setTimeFilter('all')}
@@ -243,9 +244,9 @@ export default function Events() {
             View All
           </button>
         </div>
-        {timeFilter === 'month' && (
+        {timeFilter === 'week' && (
           <p className="text-xs md:text-sm text-text-muted dark:text-text-muted-dark">
-            Showing <span className="font-semibold text-primary">{new Date().toLocaleString('default', { month: 'long' })}</span>
+            Next <span className="font-semibold text-primary">7 Days</span>
           </p>
         )}
       </div>
@@ -255,8 +256,8 @@ export default function Events() {
       ) : error ? (
         <motion.div
           className="flex flex-col items-center justify-center py-12 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
         >
           <div className="mb-4 rounded-2xl bg-danger/10 p-4">
             <CalendarDays size={40} className="text-danger opacity-70" />
@@ -295,9 +296,8 @@ export default function Events() {
               onChange={(e) => setForm(p => ({ ...p, category: e.target.value }))}
               className="rounded-xl border border-border bg-surface-card px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-border-dark dark:bg-surface-card-dark dark:text-text-dark transition-all"
             >
-              <option value="birthday">🎂 Birthday</option>
               <option value="personal">💜 Personal</option>
-              <option value="custom">⭐ Custom</option>
+              <option value="work">💼 Work</option>
             </select>
           </div>
           <TextArea label="Description" value={form.description} onChange={(e) => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Optional description" rows={2} />

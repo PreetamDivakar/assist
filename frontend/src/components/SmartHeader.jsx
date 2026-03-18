@@ -64,9 +64,9 @@ const ReminderCarousel = ({ reminders }) => {
             animate="center"
             exit="exit"
             transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
+              x: { duration: 0.3 },
               opacity: { duration: 0.2 },
-              scale: { duration: 0.4 }
+              scale: { duration: 0.3 }
             }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
@@ -89,20 +89,27 @@ const ReminderCarousel = ({ reminders }) => {
             <div className={`
               flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl text-2xl
               ${item.urgent 
-                ? 'bg-danger/15 text-danger animate-pulse shadow-sm shadow-danger/20' 
+                ? 'bg-accent/15 text-accent animate-bounce shadow-sm shadow-accent/20' 
                 : 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light'}
             `}>
               {item.icon}
             </div>
             
-            <div className="flex flex-col min-w-0 overflow-hidden">
-              <span className={`text-[10px] font-bold uppercase tracking-widest mb-0.5 ${
-                item.urgent ? 'text-danger' : 'text-primary/70 dark:text-primary-light/70'
-              }`}>
-                {item.type} • {item.day}
-              </span>
-              <span className="text-base font-semibold text-text dark:text-text-dark leading-tight truncate">
-                {item.text}
+            <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
+              <div className="flex items-center justify-between w-full mb-1">
+                <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${
+                  item.urgent ? 'text-accent' : 'text-primary/70 dark:text-primary-light/70'
+                }`}>
+                  {item.type}
+                </span>
+                <span className={`text-[10px] font-black uppercase tracking-[0.1em] ${
+                  item.urgent ? 'text-accent' : 'text-text-muted dark:text-text-muted-dark'
+                }`}>
+                  {item.dayLabel}
+                </span>
+              </div>
+              <span className="text-lg md:text-xl font-black text-text dark:text-text-dark leading-none truncate">
+                {item.name}
               </span>
             </div>
           </motion.div>
@@ -150,49 +157,28 @@ export default function SmartHeader({ stats }) {
   useEffect(() => {
     const fetchReminders = async () => {
       try {
-        const [birthdayRes, upcomingRes] = await Promise.all([
-          fetch(`${API_BASE}/events/reminders`),
-          fetch(`${API_BASE}/events/upcoming?days=7`)
-        ]);
-        
+        const birthdayRes = await fetch(`${API_BASE}/events/reminders`);
         const birthdayReminders = await birthdayRes.json();
-        const upcomingEvents = await upcomingRes.json();
         
         const items = [];
 
-        // Process Birthdays for the next 7 days
+        // Process Birthdays - Only birthdays as requested
         (Array.isArray(birthdayReminders) ? birthdayReminders : [])
-          .filter(b => b.days_remaining >= 0 && b.days_remaining <= 7)
+          .filter(b => b.days_remaining >= 0)
+          .sort((a, b) => a.days_remaining - b.days_remaining)
+          .slice(0, 5) // Limit to 5 as requested
           .forEach(b => {
             const isToday = b.days_remaining === 0;
             items.push({
               id: `bday-${b.id}`,
-              icon: isToday ? '🎂' : '🎁',
-              text: isToday ? `${b.title} is today!` : `${b.title} in ${b.days_remaining} days`,
-              type: 'birthday',
+              icon: isToday ? '🥳' : '🎂',
+              name: b.title,
+              type: 'Birthday',
               urgent: isToday,
               daysRemaining: b.days_remaining,
-              day: isToday ? 'TODAY' : `In ${b.days_remaining}d`
+              dayLabel: isToday ? 'Today' : `In ${b.days_remaining} d`
             });
           });
-
-        // Process Upcoming Events
-        (Array.isArray(upcomingEvents) ? upcomingEvents : [])
-          .forEach(e => {
-            const isToday = e.days_remaining === 0;
-            items.push({
-              id: `event-${e.id}`,
-              icon: '📅',
-              text: isToday ? `${e.title} — today!` : `${e.title}`,
-              type: 'event',
-              urgent: isToday,
-              daysRemaining: e.days_remaining,
-              day: isToday ? 'TODAY' : `In ${e.days_remaining}d`
-            });
-          });
-
-        // Sort by urgency/days remaining
-        items.sort((a, b) => a.daysRemaining - b.daysRemaining);
 
         setReminders(items);
         setLoading(false);
@@ -213,57 +199,34 @@ export default function SmartHeader({ stats }) {
   });
 
   return (
-    <motion.div
-      className="w-full max-w-2xl mx-auto mb-8 relative z-10"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-    >
-      <div className="px-4">
+    <div className="w-full max-w-2xl mx-auto mb-8 relative z-10">
+      <div className="px-4 text-center md:text-left">
         {/* Date Subtitle */}
-        <motion.p
-          className="text-xs md:text-sm uppercase tracking-[0.3em] font-bold text-text-muted dark:text-text-muted-dark mb-2 px-1 text-center md:text-left"
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+        <p className="text-xs md:text-sm uppercase tracking-[0.3em] font-bold text-text-muted dark:text-text-muted-dark mb-2 px-1">
           {todayDate}
-        </motion.p>
+        </p>
 
         {/* Dynamic Greeting */}
-        <motion.h1
-          className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8 flex flex-wrap items-baseline justify-center md:justify-start gap-x-4"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-        >
-          <span className="text-text dark:text-text-dark">
-            {greeting},
-          </span>
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8 flex flex-wrap items-baseline justify-center md:justify-start gap-x-4 text-text dark:text-text-dark">
+          <span>{greeting},</span>
           <br className="md:hidden" />
-          <span className="text-primary">
-            Preetam
-          </span>
+          <span className="text-primary">Preetam</span>
           <span className="text-2xl md:text-4xl lg:text-5xl align-middle ml-1">✨</span>
-        </motion.h1>
+        </h1>
 
         {/* Reminder Carousel */}
         {loading ? (
              <div className="flex justify-center md:justify-start">
-               <motion.div
-                 className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white/30 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10"
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: 1 }}
-               >
-                 <span className="text-sm font-medium text-text-muted dark:text-text-muted-dark italic animate-pulse">
+               <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white/30 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10">
+                 <span className="text-sm font-medium text-text-muted dark:text-text-muted-dark italic">
                    ⚡ Syncing reminders...
                  </span>
-               </motion.div>
+               </div>
              </div>
         ) : reminders.length > 0 ? (
           <ReminderCarousel reminders={reminders} />
         ) : null}
       </div>
-    </motion.div>
+    </div>
   );
 }

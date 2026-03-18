@@ -1,5 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Loader2, CheckCircle2 } from 'lucide-react';
 
 export function Modal({ isOpen, onClose, title, children }) {
   return (
@@ -10,14 +9,15 @@ export function Modal({ isOpen, onClose, title, children }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
         >
           <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={onClose} />
           <motion.div
             className="relative flex flex-col w-full md:max-w-md max-h-[90vh] rounded-t-[2.5rem] md:rounded-[2.5rem] bg-surface-card p-6 md:p-8 shadow-2xl dark:bg-surface-card-dark border-t border-x md:border border-white/20"
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.2 }}
           >
             <div className="mb-6 flex items-center justify-between shrink-0">
               <h3 className="text-xl font-bold tracking-tight">{title}</h3>
@@ -64,8 +64,9 @@ export function EmptyState({ icon: Icon, title, description }) {
   return (
     <motion.div
       className="flex flex-col items-center justify-center py-16 text-center"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
     >
       {Icon && <Icon size={48} className="mb-4 text-primary-light opacity-50" />}
       <h3 className="mb-2 text-lg font-semibold opacity-70">{title}</h3>
@@ -95,9 +96,7 @@ export function FloatingActionButton({ onClick, icon: Icon }) {
     <motion.button
       onClick={onClick}
       className="fixed bottom-8 right-8 z-40 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-white premium-shadow"
-      whileHover={{ scale: 1.05, y: -4, transition: { duration: 0.1, ease: "easeOut" } }}
-      whileTap={{ scale: 0.95, transition: { duration: 0.05 } }}
-      transition={{ type: "spring", stiffness: 400, damping: 10 }}
+      transition={{ duration: 0.2 }}
     >
       <Icon size={28} />
     </motion.button>
@@ -111,7 +110,6 @@ export function PageHeader({ title, onBack, children }) {
         <motion.button
           onClick={onBack}
           className="rounded-full p-1.5 md:p-2 transition-colors hover:bg-primary/10"
-          whileTap={{ scale: 0.9 }}
         >
           <svg className="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         </motion.button>
@@ -163,7 +161,7 @@ export function TextArea({ label, ...props }) {
   );
 }
 
-export function Button({ children, variant = 'primary', ...props }) {
+export function Button({ children, variant = 'primary', isLoading, isSuccess, ...props }) {
   const styles = {
     primary: 'bg-primary text-white premium-shadow',
     secondary: 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light hover:bg-primary/20 dark:hover:bg-primary/30',
@@ -172,13 +170,64 @@ export function Button({ children, variant = 'primary', ...props }) {
   };
   return (
     <motion.button
-      whileHover={{ scale: 1.02, transition: { duration: 0.1, ease: "easeOut" } }}
-      whileTap={{ scale: 0.98, transition: { duration: 0.05 } }}
-      className={`rounded-2xl px-6 py-3.5 text-sm font-bold tracking-tight transition-all flex items-center justify-center gap-2 ${styles[variant]} ${props.className || ''}`}
+      disabled={isLoading || props.disabled}
+      className={`rounded-2xl px-6 py-3.5 text-sm font-bold tracking-tight transition-all flex items-center justify-center gap-2 ${styles[variant]} ${props.className || ''} ${isLoading ? 'opacity-80 cursor-wait' : ''}`}
       {...props}
     >
-      {children}
+      {isLoading ? (
+        <>
+          <Loader2 size={18} className="animate-spin" />
+          <span>Processing...</span>
+        </>
+      ) : isSuccess ? (
+        <>
+          <CheckCircle2 size={18} className="text-white" />
+          <span>Success!</span>
+        </>
+      ) : (
+        children
+      )}
     </motion.button>
+  );
+}
+
+export function LoadingOverlay({ isActive, isSuccess, message = 'Saving...' }) {
+  return (
+    <AnimatePresence>
+      {isActive && (
+        <motion.div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="flex flex-col items-center gap-4 rounded-[2.5rem] bg-surface-card p-10 shadow-2xl dark:bg-surface-card-dark border border-white/20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            {isSuccess ? (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <CheckCircle2 size={48} className="text-success" />
+                </motion.div>
+                <span className="text-lg font-bold">Success!</span>
+              </>
+            ) : (
+              <>
+                <Loader2 size={48} className="animate-spin text-primary" />
+                <span className="text-lg font-bold">{message}</span>
+              </>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

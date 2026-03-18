@@ -74,18 +74,11 @@ export default function AIChatBubble() {
           <motion.button
             onClick={() => setIsOpen(true)}
             className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-primary shadow-2xl shadow-primary/30 text-white"
-            initial={{ scale: 0, rotate: -45 }}
-            animate={{ scale: 1, rotate: 0 }}
-            exit={{ scale: 0, rotate: 45 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
           >
             <Sparkles size={24} />
-            <motion.span 
-              className="absolute inset-0 rounded-full border-2 border-primary"
-              animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
           </motion.button>
         )}
       </AnimatePresence>
@@ -108,7 +101,7 @@ export default function AIChatBubble() {
               initial={{ y: '100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              transition={{ duration: 0.3 }}
             >
               {/* Grabber for Mobile */}
               <div className="w-12 h-1.5 bg-black/10 dark:bg-white/10 rounded-full mx-auto mt-3 md:hidden" />
@@ -141,16 +134,17 @@ export default function AIChatBubble() {
                   <motion.div
                     key={i}
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.3, delay: i * 0.05 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                   >
-                    <div
-                      className={`max-w-[85%] px-4 py-3 rounded-[1.25rem] text-[15px] leading-[1.4] shadow-sm ${
-                        msg.role === 'user'
-                          ? 'bg-primary text-white rounded-tr-none'
-                          : 'bg-white/50 dark:bg-white/5 text-text dark:text-text-dark border border-white/20 dark:border-white/10 rounded-tl-none'
+                    <motion.div
+                      className={`max-w-[85%] rounded-[1.8rem] px-5 py-3 text-sm font-medium shadow-sm break-words ${
+                        msg.role === 'user' 
+                          ? 'bg-primary text-white rounded-br-md self-end' 
+                          : 'bg-white/10 text-white rounded-bl-md self-start border border-white/10'
                       }`}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                     >
                       {msg.content.split('\n').map((line, j) => (
                         <span key={j}>
@@ -158,7 +152,7 @@ export default function AIChatBubble() {
                           {j < msg.content.split('\n').length - 1 && <br />}
                         </span>
                       ))}
-                    </div>
+                    </motion.div>
                   </motion.div>
                 ))}
                 
@@ -194,8 +188,6 @@ export default function AIChatBubble() {
                     onClick={sendMessage}
                     disabled={!input.trim() || loading}
                     className="absolute right-1.5 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center disabled:opacity-30 disabled:grayscale transition-all"
-                    whileHover={input.trim() ? { scale: 1.05 } : {}}
-                    whileTap={input.trim() ? { scale: 0.95 } : {}}
                   >
                     <Send size={18} />
                   </motion.button>

@@ -1,11 +1,9 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Cake, Heart, User, CalendarDays, Sun, Moon } from 'lucide-react';
-import { useThemeStore, useDashboardStore } from '../stores/store';
-import { eventApi } from '../api/client';
-import { Badge } from '../components/UI';
 import SmartHeader from '../components/SmartHeader';
+import AIChatBubble from '../components/AIChatBubble';
+import { Calendar } from 'lucide-react';
 
 const sections = [
   {
@@ -37,7 +35,7 @@ const sections = [
   },
   {
     title: 'Events',
-    icon: CalendarDays,
+    icon: Calendar,
     path: '/events',
     gradient: 'from-amber-500 to-orange-400',
     shadow: 'shadow-amber-500/20',
@@ -56,22 +54,12 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative flex min-h-dvh flex-col items-center justify-center p-4 overflow-hidden">
+    <div className="relative flex min-h-dvh fixed-home items-center justify-center p-4 overflow-hidden">
       {/* BG Glow orbs */}
       <div className="pointer-events-none absolute -top-[10%] -left-[10%] h-[60%] w-[60%] rounded-full bg-primary/10 blur-[120px]" />
       <div className="pointer-events-none absolute -bottom-[10%] -right-[10%] h-[60%] w-[60%] rounded-full bg-accent/10 blur-[120px]" />
 
-      {/* Top-right controls */}
-      <div className="absolute top-8 right-8 z-20">
-        <motion.button
-          onClick={toggleTheme}
-          className="rounded-full p-3.5 glass dark:glass-dark shadow-sm border border-white/20"
-          whileHover={{ scale: 1.1, rotate: 15 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-        </motion.button>
-      </div>
+      {/* Top-right controls - Removed theme toggle as requested */}
 
       {/* Smart Header replaces old static title */}
       <SmartHeader stats={stats} />
@@ -89,9 +77,7 @@ export default function Home() {
             `}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 + 0.3, type: 'spring', stiffness: 200, damping: 20 }}
-            whileHover={{ scale: 1.03, y: -4, transition: { duration: 0.1, ease: "easeOut" } }}
-            whileTap={{ scale: 0.98, transition: { duration: 0.05 } }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
           >
             {/* Background Accent Gradient */}
             <div className={`absolute inset-0 bg-gradient-to-br ${section.gradient} opacity-[0.03] dark:opacity-[0.1] group-hover:opacity-[0.08] dark:group-hover:opacity-[0.15] transition-opacity`} />
@@ -123,28 +109,7 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Dashboard footer stats */}
-      {stats && (
-        <motion.div
-          className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🎂</span>
-            <span className="text-xs font-bold uppercase tracking-widest text-text-muted">{stats.upcoming_birthdays_count} Birthdays</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xl">📅</span>
-            <span className="text-xs font-bold uppercase tracking-widest text-text-muted">{stats.today_events_count} Today</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xl">✅</span>
-            <span className="text-xs font-bold uppercase tracking-widest text-text-muted">{stats.bucket_list_completed}/{stats.bucket_list_total} Bucket</span>
-          </div>
-        </motion.div>
-      )}
+      <AIChatBubble />
     </div>
   );
 }

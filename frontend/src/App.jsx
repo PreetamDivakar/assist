@@ -40,7 +40,6 @@ export default function App() {
   return (
     <HashRouter>
       <AnimatedRoutes />
-      <AIChatBubble />
     </HashRouter>
   );
 }

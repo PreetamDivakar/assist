@@ -87,16 +87,38 @@ function DetailsTab() {
   }, []);
 
   const handleSave = async () => {
-    const updated = await preeApi.updateDetails(form);
-    setDetails(updated);
-    setEditing(false);
+    setLoading(true);
+    try {
+      const updated = await preeApi.updateDetails(form);
+      setDetails(updated);
+      setEditing(false);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateField = (section, key, value) => {
-    setForm(prev => ({
-      ...prev,
-      [section]: { ...prev[section], [key]: value }
-    }));
+    setForm(prev => {
+      const newSection = { ...prev[section], [key]: value };
+      
+      // Auto-calculate height in foot/inches if height_cm changes
+      if (section === 'personal' && key === 'height_cm' && value) {
+        const cm = parseFloat(value);
+        if (!isNaN(cm)) {
+          const totalInches = cm / 2.54;
+          const feet = Math.floor(totalInches / 12);
+          const inches = Math.round(totalInches % 12);
+          newSection.height_ft = `${feet}'${inches}"`;
+        }
+      }
+      
+      return {
+        ...prev,
+        [section]: newSection
+      };
+    });
   };
 
   if (loading) return <SkeletonList count={3} />;
@@ -131,18 +153,18 @@ function DetailsTab() {
         {FIELD_MAP[section].map(({ key, label }) => {
           const val = form[section]?.[key];
           return (
-            <div key={key} className="flex items-center gap-2 md:gap-3 p-3 box-in-box mb-1 last:mb-0">
-              <span className="w-24 md:w-28 text-[10px] md:text-xs font-black uppercase tracking-widest text-primary/70 dark:text-primary-light/50 truncate px-1">
+            <div key={key} className="flex flex-wrap items-center gap-2 md:gap-3 p-3 box-in-box mb-1 last:mb-0">
+              <span className="w-full md:w-28 text-[10px] md:text-xs font-black uppercase tracking-widest text-primary/70 dark:text-primary-light/50 px-1">
                 {label}
               </span>
               {editing ? (
                 <Input
                   value={val || ''}
                   onChange={(e) => updateField(section, key, e.target.value)}
-                  className="!py-1 !px-2 !text-xs flex-1"
+                  className="!py-1 !px-2 !text-xs flex-1 min-w-[120px]"
                 />
               ) : (
-                <span className="text-sm md:text-base truncate font-bold text-text dark:text-white flex-1 text-right md:text-left">{val || '—'}</span>
+                <span className="text-sm md:text-base font-bold text-text dark:text-white flex-1 break-words">{val || '—'}</span>
               )}
             </div>
           );
@@ -217,15 +239,14 @@ function NotesTab({ triggerAdd }) {
             {notes.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map((n, i) => (
               <motion.div
                 key={n.id}
-                className="group rounded-3xl glass dark:glass-dark p-5 md:p-6 shadow-sm border border-white/10"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
+                className="group rounded-3xl glass dark:glass-dark p-5 md:p-6 shadow-sm border border-white/10 overflow-hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0 px-1">
-                    <h4 className="text-lg font-bold tracking-tight mb-2">{n.title}</h4>
-                    <p className="text-sm leading-relaxed text-text-muted dark:text-text-muted-dark whitespace-pre-wrap">{n.content}</p>
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0 px-1 break-words">
+                    <h4 className="text-lg font-bold tracking-tight mb-2 break-words">{n.title}</h4>
+                    <p className="text-sm leading-relaxed text-text-muted dark:text-text-muted-dark whitespace-pre-wrap break-words">{n.content}</p>
                   </div>
                   <div className="flex gap-2 opacity-100 md:opacity-0 transition-opacity group-hover:opacity-100 shrink-0">
                     <button onClick={() => { setEditNote(n); setNoteForm({ title: n.title, content: n.content }); setShowAddNote(true); }} className="rounded-xl p-2 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20"><Edit className="w-4 h-4" /></button>

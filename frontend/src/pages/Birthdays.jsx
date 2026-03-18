@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Cake, Search, Plus, Trash2, Edit, Bell, BellOff } from 'lucide-react';
 import { birthdayApi } from '../api/client';
 import {
-  EmptyState, SkeletonList, Input, Button, TextArea, Pagination, PageHeader, Badge, FloatingActionButton, Modal, ConfirmDialog
+  EmptyState, SkeletonList, Input, Button, TextArea, Pagination, PageHeader, Badge, FloatingActionButton, Modal, ConfirmDialog, LoadingOverlay
 } from '../components/UI';
 
 const ITEMS_PER_PAGE = 10;
@@ -31,7 +31,18 @@ export default function Birthdays() {
         : filter === 'all'
           ? await birthdayApi.getAll()
           : await birthdayApi.getByMonth(currentMonth);
-      setBirthdays(data);
+      
+      // Sort by month and day ascending
+      const sorted = (Array.isArray(data) ? data : []).sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        if (dateA.getMonth() !== dateB.getMonth()) {
+          return dateA.getMonth() - dateB.getMonth();
+        }
+        return dateA.getDate() - dateB.getDate();
+      });
+      
+      setBirthdays(sorted);
     } catch (e) {
       console.error(e);
     }
@@ -42,15 +53,22 @@ export default function Birthdays() {
 
   const handleSave = async () => {
     if (!form.name || !form.date) return;
-    if (editItem) {
-      await birthdayApi.update(editItem.id, form);
-    } else {
-      await birthdayApi.create(form);
+    setLoading(true);
+    try {
+      if (editItem) {
+        await birthdayApi.update(editItem.id, form);
+      } else {
+        await birthdayApi.create(form);
+      }
+      setShowAdd(false);
+      setEditItem(null);
+      setForm({ name: '', date: '', notes: '' });
+      await load();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
-    setShowAdd(false);
-    setEditItem(null);
-    setForm({ name: '', date: '', notes: '' });
-    load();
   };
 
   const handleDelete = async () => {
@@ -133,16 +151,14 @@ export default function Birthdays() {
         <>
           <div className="flex flex-col gap-3">
             <AnimatePresence>
-              {birthdays.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map((b, i) => (
+              {birthdays.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map((b) => (
                 <motion.div
                   key={b.id}
                   className={`group relative rounded-3xl p-5 transition-all glass dark:glass-dark premium-shadow ${
                     b.is_upcoming ? 'ring-2 ring-accent/20' : ''
                   }`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ delay: i * 0.05 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
@@ -210,6 +226,8 @@ export default function Birthdays() {
         title="Delete Birthday"
         message="Are you sure you want to delete this birthday?"
       />
+
+      <LoadingOverlay isActive={loading} message={editItem ? "Updating..." : "Creating..."} />
     </div>
   );
 }

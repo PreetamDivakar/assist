@@ -1,18 +1,17 @@
 import { create } from 'zustand';
 
 export const useThemeStore = create((set) => ({
-  theme: localStorage.getItem('theme') || 'dark',
-  toggleTheme: () =>
-    set((state) => {
-      const newTheme = state.theme === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('theme', newTheme);
-      document.body.className = newTheme;
-      return { theme: newTheme };
-    }),
+  theme: 'dark',
+  toggleTheme: () => {
+    // Theme is locked to dark
+    document.body.className = 'dark';
+    return { theme: 'dark' };
+  },
   initTheme: () =>
-    set((state) => {
-      document.body.className = state.theme;
-      return {};
+    set(() => {
+      document.body.className = 'dark';
+      localStorage.setItem('theme', 'dark');
+      return { theme: 'dark' };
     }),
 }));
 
