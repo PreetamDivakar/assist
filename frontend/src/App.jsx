@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useThemeStore } from './stores/store';
 import Home from './pages/Home';
@@ -38,9 +38,9 @@ export default function App() {
   useEffect(() => { initTheme(); }, []);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <AnimatedRoutes />
       <AIChatBubble />
-    </BrowserRouter>
+    </HashRouter>
   );
 }

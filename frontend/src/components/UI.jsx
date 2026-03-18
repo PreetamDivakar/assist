@@ -143,7 +143,7 @@ export function Input({ label, ...props }) {
       {label && <label className="text-xs md:text-sm font-medium text-text-muted dark:text-text-muted-dark">{label}</label>}
       <input
         {...props}
-        className={`rounded-xl border border-border bg-surface-card px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-border-dark dark:bg-surface-card-dark dark:text-text-dark ${props.className || ''}`}
+        className={`rounded-xl border border-border bg-surface-card px-3.5 py-2.5 md:px-4.5 md:py-3 text-sm md:text-base outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-border-dark dark:bg-surface-card-dark dark:text-text-dark ${props.className || ''}`}
       />
     </div>
   );
@@ -172,7 +172,7 @@ export function Button({ children, variant = 'primary', ...props }) {
     <motion.button
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className={`rounded-xl px-4 py-2 md:py-2.5 text-sm md:text-base font-medium transition-all ${styles[variant]} ${props.className || ''}`}
+      className={`rounded-xl px-4.5 py-2.5 md:py-3 text-sm md:text-base font-medium transition-all ${styles[variant]} ${props.className || ''}`}
       {...props}
     >
       {children}

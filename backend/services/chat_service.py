@@ -34,19 +34,14 @@ def gather_context(db: Session) -> str:
             lines.append(f"### {d.person.title()}")
             if d.clothing_sizes:
                 sizes_dict = d.clothing_sizes if isinstance(d.clothing_sizes, dict) else json.loads(d.clothing_sizes)
-                sizes = ", ".join(f"{k}: {v}" for k, v in sizes_dict.items() if v)
+                sizes = ", ".join(f"{k.replace('_', ' ')}: {v}" for k, v in sizes_dict.items() if v)
                 if sizes:
                     lines.append(f"  Clothing: {sizes}")
-            if d.contact_info:
-                contact_dict = d.contact_info if isinstance(d.contact_info, dict) else json.loads(d.contact_info)
-                contacts = ", ".join(f"{k}: {v}" for k, v in contact_dict.items() if v)
-                if contacts:
-                    lines.append(f"  Contact: {contacts}")
-            if d.preferences:
-                pref_dict = d.preferences if isinstance(d.preferences, dict) else json.loads(d.preferences)
-                prefs = ", ".join(f"{k}: {v}" for k, v in pref_dict.items() if v)
-                if prefs:
-                    lines.append(f"  Preferences: {prefs}")
+            if d.personal:
+                pers_dict = d.personal if isinstance(d.personal, dict) else json.loads(d.personal)
+                pers = ", ".join(f"{k.replace('_', ' ')}: {v}" for k, v in pers_dict.items() if v)
+                if pers:
+                    lines.append(f"  Personal Info: {pers}")
         sections.append("\n".join(lines))
 
     # --- Notes ---
@@ -103,8 +98,30 @@ Rules:
 - Never make up data that isn't in the database"""
 
 
+def get_model_for_query(query: str) -> str:
+    """Heuristic to determine which LLM model to use."""
+    query_lower = query.lower()
+    
+    # Simple Query Heuristic:
+    # 1. Short messages (greetings, simple questions)
+    # 2. No data-related keywords
+    data_keywords = [
+        "birthday", "event", "jiya", "pree", "note", "list", 
+        "preference", "clothing", "size", "height", "blood", 
+        "company", "color", "colour", "remind"
+    ]
+    
+    is_data_related = any(kw in query_lower for kw in data_keywords)
+    is_short = len(query) < 50
+    
+    if is_short and not is_data_related:
+        return "llama-3.1-8b-instant"
+    else:
+        return "llama-3.3-70b-versatile"
+
+
 def ask_ai(context: str, user_message: str, chat_history: list = None) -> str:
-    """Send question to Groq (Llama 3) with database context. Read-only access."""
+    """Send question to Groq with dynamic model selection. Read-only access."""
     from dotenv import load_dotenv
     from pathlib import Path
     
@@ -142,8 +159,10 @@ IMPORTANT: You have READ-ONLY access to the database context provided above.
 
         messages.append({"role": "user", "content": user_message})
 
+        model = get_model_for_query(user_message)
+
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model=model,
             messages=messages,
             temperature=0.7,
             max_tokens=1024,
@@ -153,9 +172,6 @@ IMPORTANT: You have READ-ONLY access to the database context provided above.
             return "I'm sorry, I couldn't generate a response for that."
         
         return response.choices[0].message.content
-
-    except Exception as e:
-        return f"Sorry, I ran into an error with Groq: {str(e)}"
 
     except Exception as e:
         return f"Sorry, I ran into an error with Groq: {str(e)}"
