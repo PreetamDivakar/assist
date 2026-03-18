@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, Send, X, Bot, User, Loader2 } from 'lucide-react';
+import { MessageCircle, Send, X, Sparkles, User, Loader2, Minus } from 'lucide-react';
 
 import { API_BASE } from '../api/client';
 
@@ -19,7 +19,9 @@ export default function AIChatBubble() {
   }, [messages]);
 
   useEffect(() => {
-    if (isOpen) inputRef.current?.focus();
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 400);
+    }
   }, [isOpen]);
 
   const sendMessage = async () => {
@@ -67,133 +69,143 @@ export default function AIChatBubble() {
 
   return (
     <>
-      {/* Floating Chat Button */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 to-pink-500 text-white shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-shadow"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
+            className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-primary shadow-2xl shadow-primary/30 text-white"
+            initial={{ scale: 0, rotate: -45 }}
+            animate={{ scale: 1, rotate: 0 }}
+            exit={{ scale: 0, rotate: 45 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <MessageCircle size={24} />
-            {/* Pulse animation */}
-            <span className="absolute inset-0 rounded-full bg-violet-500 animate-ping opacity-20" />
+            <Sparkles size={24} />
+            <motion.span 
+              className="absolute inset-0 rounded-full border-2 border-primary"
+              animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Chat Panel */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            className="fixed bottom-4 right-4 z-50 w-[calc(100vw-2rem)] max-w-sm h-[min(70vh,32rem)] flex flex-col rounded-2xl overflow-hidden border border-white/15 shadow-2xl shadow-black/40"
-            style={{ backdropFilter: 'blur(24px)' }}
-            initial={{ opacity: 0, y: 40, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 40, scale: 0.9 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-violet-600/90 to-pink-500/90 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                  <Bot size={18} className="text-white" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white">Ask My Assistant</h3>
-                  <span className="text-[10px] text-white/60">Powered by AI • Knows your data</span>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-              >
-                <X size={16} className="text-white" />
-              </button>
-            </div>
+          <div className="fixed inset-0 z-50 flex items-end justify-center md:items-end md:justify-end md:p-6 pointer-events-none">
+            {/* Backdrop for mobile */}
+            <motion.div 
+              className="absolute inset-0 bg-black/20 backdrop-blur-sm md:hidden pointer-events-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+            />
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-surface-dark/95 dark:bg-surface-dark/95">
-              {messages.map((msg, i) => (
-                <motion.div
-                  key={i}
-                  className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {msg.role === 'assistant' && (
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center flex-shrink-0 mt-1">
-                      <Bot size={12} className="text-white" />
-                    </div>
-                  )}
-                  <div
-                    className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${
-                      msg.role === 'user'
-                        ? 'bg-gradient-to-br from-violet-600 to-violet-700 text-white rounded-br-md'
-                        : 'bg-white/8 dark:bg-white/8 text-text-dark border border-white/5 rounded-bl-md'
-                    }`}
-                  >
-                    {msg.content.split('\n').map((line, j) => (
-                      <span key={j}>
-                        {line}
-                        {j < msg.content.split('\n').length - 1 && <br />}
-                      </span>
-                    ))}
-                  </div>
-                  {msg.role === 'user' && (
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center flex-shrink-0 mt-1">
-                      <User size={12} className="text-white" />
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-              {loading && (
-                <motion.div
-                  className="flex gap-2 justify-start"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center flex-shrink-0 mt-1">
-                    <Bot size={12} className="text-white" />
-                  </div>
-                  <div className="bg-white/8 border border-white/5 rounded-2xl rounded-bl-md px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Loader2 size={14} className="animate-spin text-violet-400" />
-                      <span className="text-xs text-text-muted-dark">Thinking...</span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
+            <motion.div
+              className="relative flex flex-col w-full md:w-[400px] h-[85vh] md:h-[600px] bg-white/70 dark:bg-surface-dark/70 border border-white/20 dark:border-white/10 shadow-2xl rounded-t-[2.5rem] md:rounded-[2.5rem] pointer-events-auto overflow-hidden"
+              style={{ backdropFilter: 'blur(32px) saturate(180%)' }}
+              initial={{ y: '100%', opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: '100%', opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            >
+              {/* Grabber for Mobile */}
+              <div className="w-12 h-1.5 bg-black/10 dark:bg-white/10 rounded-full mx-auto mt-3 md:hidden" />
 
-            {/* Input */}
-            <div className="p-3 border-t border-white/10 bg-surface-dark/95">
-              <div className="flex items-center gap-2 bg-white/5 rounded-xl border border-white/10 px-3 py-1.5">
-                <input
-                  ref={inputRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Ask me anything..."
-                  className="flex-1 bg-transparent text-sm text-text-dark placeholder:text-text-muted-dark outline-none py-1.5"
-                  disabled={loading}
-                />
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-black/5 dark:border-white/5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Sparkles size={20} className="text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-text dark:text-text-dark">Assistant</h3>
+                    <div className="flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                      <span className="text-[10px] font-medium text-text-muted dark:text-text-muted-dark uppercase tracking-wider">Online</span>
+                    </div>
+                  </div>
+                </div>
                 <button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || loading}
-                  className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-pink-500 flex items-center justify-center text-white disabled:opacity-30 hover:opacity-90 transition-opacity"
+                  onClick={() => setIsOpen(false)}
+                  className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 flex items-center justify-center transition-colors"
                 >
-                  <Send size={14} />
+                  <X size={16} className="text-text-muted dark:text-text-muted-dark" />
                 </button>
               </div>
-            </div>
-          </motion.div>
+
+              {/* Messages Container */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+                {messages.map((msg, i) => (
+                  <motion.div
+                    key={i}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.3, delay: i * 0.05 }}
+                  >
+                    <div
+                      className={`max-w-[85%] px-4 py-3 rounded-[1.25rem] text-[15px] leading-[1.4] shadow-sm ${
+                        msg.role === 'user'
+                          ? 'bg-primary text-white rounded-tr-none'
+                          : 'bg-white/50 dark:bg-white/5 text-text dark:text-text-dark border border-white/20 dark:border-white/10 rounded-tl-none'
+                      }`}
+                    >
+                      {msg.content.split('\n').map((line, j) => (
+                        <span key={j}>
+                          {line}
+                          {j < msg.content.split('\n').length - 1 && <br />}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                ))}
+                
+                {loading && (
+                  <motion.div
+                    className="flex justify-start"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <div className="bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 rounded-[1.25rem] rounded-tl-none px-4 py-3 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </motion.div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input Area */}
+              <div className="p-4 md:p-6 bg-white/30 dark:bg-white/5 backdrop-blur-md border-t border-black/5 dark:border-white/5">
+                <div className="relative flex items-center">
+                  <input
+                    ref={inputRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Message Assistant..."
+                    className="w-full bg-black/5 dark:bg-white/5 text-text dark:text-text-dark placeholder:text-text-muted/60 dark:placeholder:text-text-muted-dark/40 rounded-[1.5rem] pl-5 pr-12 py-3.5 outline-none focus:ring-2 focus:ring-primary/20 transition-all text-[15px]"
+                    disabled={loading}
+                  />
+                  <motion.button
+                    onClick={sendMessage}
+                    disabled={!input.trim() || loading}
+                    className="absolute right-1.5 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center disabled:opacity-30 disabled:grayscale transition-all"
+                    whileHover={input.trim() ? { scale: 1.05 } : {}}
+                    whileTap={input.trim() ? { scale: 0.95 } : {}}
+                  >
+                    <Send size={18} />
+                  </motion.button>
+                </div>
+                <p className="mt-3 text-[10px] text-center text-text-muted dark:text-text-muted-dark opacity-50 uppercase tracking-widest font-medium">
+                  Knows your data • Apple Inspired
+                </p>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </>
