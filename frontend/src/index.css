@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+/* ─── Tailwind v4: class-based dark mode using body.dark ─── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: #7c3aed;
+  --color-primary-light: #a78bfa;
+  --color-primary-dark: #5b21b6;
+  --color-accent: #f472b6;
+  --color-accent-light: #f9a8d4;
+  --color-surface: #ffffff;
+  --color-surface-dark: #1e1b2e;
+  --color-surface-card: #f8f7ff;
+  --color-surface-card-dark: #2a2740;
+  --color-text: #1e1b2e;
+  --color-text-dark: #e8e6f0;
+  --color-text-muted: #6b7280;
+  --color-text-muted-dark: #9ca3af;
+  --color-border: #e5e7eb;
+  --color-border-dark: #3d3a50;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply box-border;
+  }
+  body {
+    font-family: var(--font-sans);
+    @apply m-0 p-0 antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+  }
+  body.light {
+    @apply bg-surface text-text;
+    color-scheme: light;
+  }
+  body.dark {
+    @apply bg-surface-dark text-text-dark;
+    color-scheme: dark;
+  }
+}
+
+/* ─── Scrollbar styling ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary-light);
+  border-radius: 3px;
+}
+
+/* ─── Skeleton shimmer animation ─── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+.dark .skeleton {
+  background: linear-gradient(90deg, #2a2740 25%, #3d3a50 50%, #2a2740 75%);
+  background-size: 200% 100%;
+}
+
+/* ─── Dark theme form elements ─── */
+.dark select option {
+  background-color: var(--color-surface-card-dark);
+  color: var(--color-text-dark);
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+  color-scheme: dark;
+}
+
+/* Date picker & color picker dark overrides */
+.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.dark input[type="time"]::-webkit-calendar-picker-indicator,
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+}
+
+/* Checkbox styling */
+.dark input[type="checkbox"] {
+  accent-color: var(--color-primary);
+}
