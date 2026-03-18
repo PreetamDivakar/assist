@@ -19,6 +19,7 @@ export default function Birthdays() {
   const [showAdd, setShowAdd] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [error, setError] = useState(null);
   const [form, setForm] = useState({ name: '', date: '', notes: '' });
 
   const currentMonth = new Date().getMonth() + 1;
@@ -38,6 +39,7 @@ export default function Birthdays() {
       setBirthdays(sorted);
     } catch (e) {
       console.error(e);
+      setError(e.message || 'Failed to load birthdays');
     }
     setLoading(false);
   };
@@ -59,6 +61,7 @@ export default function Birthdays() {
       await load();
     } catch (e) {
       console.error(e);
+      alert(e.message || 'Failed to save birthday');
     } finally {
       setLoading(false);
     }
