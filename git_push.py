@@ -15,7 +15,7 @@ def main():
     
     execute("git init")
     execute("git add .")
-    execute('git commit -m "Fix Render deployment by setting Python version to 3.11.0 and updating API_BASE"')
+    execute('git commit -m "Fix CORS policy to allow Vercel frontend to seamlessly communicate with Render backend"')
     execute("git branch -M main")
     
     # Try adding remote, if it fails it might already exist

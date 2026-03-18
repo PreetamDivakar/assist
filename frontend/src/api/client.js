@@ -1,4 +1,5 @@
-const API_BASE = '/api';
+//const API_BASE = '/api';
+const API_BASE = 'https://assist-api-1n6p.onrender.com';
 
 async function request(url, options = {}) {
   const config = {
