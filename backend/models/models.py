@@ -21,8 +21,7 @@ class PersonalDetail(Base):
     id = Column(Integer, primary_key=True, index=True)
     person = Column(String(50), nullable=False, unique=True, index=True)  # "jiya" or "pree"
     clothing_sizes = Column(JSON, default=dict)
-    contact_info = Column(JSON, default=dict)
-    preferences = Column(JSON, default=dict)
+    personal = Column(JSON, default=dict)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
 

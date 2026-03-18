@@ -26,16 +26,45 @@ def seed():
             db.add_all(birthdays)
 
         # 2. Seed Personal Details (Jiya & Pree)
-        for person in ["jiya", "pree"]:
-            if db.query(PersonalDetail).filter(PersonalDetail.person == person).count() == 0:
-                print(f"Seeding Personal Details for {person}...")
-                detail = PersonalDetail(
-                    person=person,
-                    clothing_sizes={"top": "S", "bottom": "M", "shoes": "7"},
-                    contact_info={"email": f"{person}@example.com", "phone": "123-456-7890"},
-                    preferences={"color": "Purple", "food": "Pizza", "hobby": "Reading"}
-                )
-                db.add(detail)
+        if db.query(PersonalDetail).filter(PersonalDetail.person == "jiya").count() == 0:
+            print("Seeding Personal Details for jiya...")
+            db.add(PersonalDetail(
+                person="jiya",
+                clothing_sizes={
+                    "shirt_size": "M (38)",
+                    "pant_size": "28 (S)",
+                    "undergarment_size": "32B",
+                    "dress_size": "S",
+                    "shoe_size": "5 (UK)"
+                },
+                personal={
+                    "height_cm": "165",
+                    "height_ft": "5'5\"",
+                    "blood_group": "A+",
+                    "company": "Tech Corp",
+                    "fav_colour": "Lavender"
+                }
+            ))
+        
+        if db.query(PersonalDetail).filter(PersonalDetail.person == "pree").count() == 0:
+            print("Seeding Personal Details for pree...")
+            db.add(PersonalDetail(
+                person="pree",
+                clothing_sizes={
+                    "shirt_size": "L (42)",
+                    "pant_size": "32 (L)",
+                    "underwear_size": "L",
+                    "baniyan_size": "100 (XL)",
+                    "shoe_size": "9 (UK)"
+                },
+                personal={
+                    "height_cm": "180",
+                    "height_ft": "5'11\"",
+                    "blood_group": "O+",
+                    "company": "Design Studio",
+                    "fav_colour": "Midnight Blue"
+                }
+            ))
 
         # 3. Seed Notes
         if db.query(Note).count() == 0:

@@ -18,10 +18,29 @@ const TABS = [
 export default function Jiya() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('details');
+  const [triggerAddNote, setTriggerAddNote] = useState(0);
+  const [triggerAddBucket, setTriggerAddBucket] = useState(0);
 
   return (
     <div className="min-h-dvh p-4 md:p-6 max-w-2xl mx-auto">
-      <PageHeader title="Jiya" onBack={() => navigate('/')} />
+      <PageHeader title="Jiya" onBack={() => navigate('/')}>
+        {activeTab === 'notes' && (
+          <Button 
+            onClick={() => setTriggerAddNote(v => v + 1)}
+            className="rounded-full !p-2 md:!p-2.5 shadow-md"
+          >
+            <Plus className="w-5 h-5 md:w-6 md:h-6" />
+          </Button>
+        )}
+        {activeTab === 'bucketlist' && (
+          <Button 
+            onClick={() => setTriggerAddBucket(v => v + 1)}
+            className="rounded-full !p-2 md:!p-2.5 shadow-md"
+          >
+            <Plus className="w-5 h-5 md:w-6 md:h-6" />
+          </Button>
+        )}
+      </PageHeader>
 
       {/* Tabs */}
       <div className="mb-4 md:mb-6 flex gap-1 rounded-2xl bg-surface-card p-1 dark:bg-surface-card-dark">
@@ -43,8 +62,8 @@ export default function Jiya() {
 
       <AnimatePresence mode="wait">
         {activeTab === 'details' && <DetailsTab key="details" />}
-        {activeTab === 'notes' && <NotesTab key="notes" />}
-        {activeTab === 'bucketlist' && <BucketListTab key="bucketlist" />}
+        {activeTab === 'notes' && <NotesTab key="notes" triggerAdd={triggerAddNote} />}
+        {activeTab === 'bucketlist' && <BucketListTab key="bucketlist" triggerAdd={triggerAddBucket} />}
       </AnimatePresence>
     </div>
   );
@@ -61,9 +80,20 @@ function DetailsTab() {
     jiyaApi.getDetails().then((d) => {
       setDetails(d);
       setForm({
-        clothing_sizes: d.clothing_sizes || {},
-        contact_info: d.contact_info || {},
-        preferences: d.preferences || {},
+        clothing_sizes: d.clothing_sizes || {
+          shirt_size: '',
+          pant_size: '',
+          undergarment_size: '',
+          dress_size: '',
+          shoe_size: ''
+        },
+        personal: d.personal || {
+          height_cm: '',
+          height_ft: '',
+          blood_group: '',
+          company: '',
+          fav_colour: ''
+        },
       });
       setLoading(false);
     }).catch(() => setLoading(false));
@@ -84,6 +114,23 @@ function DetailsTab() {
 
   if (loading) return <SkeletonList count={3} />;
 
+  const FIELD_MAP = {
+    clothing_sizes: [
+      { key: 'shirt_size', label: 'Shirt Size' },
+      { key: 'pant_size', label: 'Pant Size' },
+      { key: 'undergarment_size', label: 'Undergarment Size' },
+      { key: 'dress_size', label: 'Dress Size' },
+      { key: 'shoe_size', label: 'Shoe Size (UK)' },
+    ],
+    personal: [
+      { key: 'height_cm', label: 'Height (cm)' },
+      { key: 'height_ft', label: 'Height (ft)' },
+      { key: 'blood_group', label: 'Blood Group' },
+      { key: 'company', label: 'Company' },
+      { key: 'fav_colour', label: 'Fav Colour' },
+    ]
+  };
+
   const renderSection = (title, section, icon) => (
     <motion.div
       className="rounded-2xl border border-border bg-surface-card p-3 md:p-4 dark:border-border-dark dark:bg-surface-card-dark"
@@ -94,22 +141,25 @@ function DetailsTab() {
         {icon} {title}
       </h3>
       <div className="grid gap-2">
-        {Object.entries(form[section] || {}).map(([key, val]) => (
-          <div key={key} className="flex items-center gap-2 md:gap-3">
-            <span className="w-24 md:w-28 text-[10px] md:text-xs font-medium capitalize text-text-muted dark:text-text-muted-dark truncate">
-              {key.replace(/_/g, ' ')}
-            </span>
-            {editing ? (
-              <input
-                value={val}
-                onChange={(e) => updateField(section, key, e.target.value)}
-                className="flex-1 rounded-lg border border-border bg-surface-card px-2.5 md:px-3 py-1 md:py-1.5 text-xs md:text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-border-dark dark:bg-surface-card-dark dark:text-text-dark min-w-0 transition-all"
-              />
-            ) : (
-              <span className="text-xs md:text-sm truncate">{val || '—'}</span>
-            )}
-          </div>
-        ))}
+        {FIELD_MAP[section].map(({ key, label }) => {
+          const val = form[section]?.[key];
+          return (
+            <div key={key} className="flex items-center gap-2 md:gap-3">
+              <span className="w-24 md:w-28 text-[10px] md:text-xs font-medium capitalize text-text-muted dark:text-text-muted-dark truncate">
+                {label}
+              </span>
+              {editing ? (
+                <Input
+                  value={val || ''}
+                  onChange={(e) => updateField(section, key, e.target.value)}
+                  className="!py-1 !px-2 !text-xs"
+                />
+              ) : (
+                <span className="text-xs md:text-sm truncate font-medium">{val || '—'}</span>
+              )}
+            </div>
+          );
+        })}
       </div>
     </motion.div>
   );
@@ -117,8 +167,7 @@ function DetailsTab() {
   return (
     <motion.div className="flex flex-col gap-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       {renderSection('Clothing Sizes', 'clothing_sizes', '👗')}
-      {renderSection('Contact Info', 'contact_info', '📱')}
-      {renderSection('Preferences', 'preferences', '💜')}
+      {renderSection('Personal Information', 'personal', '👤')}
       <Button onClick={editing ? handleSave : () => setEditing(true)} variant={editing ? 'primary' : 'secondary'}>
         {editing ? <><Save size={16} className="inline mr-1" /> Save Changes</> : <><Edit size={16} className="inline mr-1" /> Edit</>}
       </Button>
@@ -127,7 +176,7 @@ function DetailsTab() {
 }
 
 /* ─── Notes Tab ──────────────────────────────────────────── */
-function NotesTab() {
+function NotesTab({ triggerAdd }) {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
@@ -140,6 +189,15 @@ function NotesTab() {
     jiyaApi.getNotes().then(setNotes).catch(() => {}).finally(() => setLoading(false));
   };
   useEffect(load, []);
+
+  // Handle header "Add" button trigger
+  useEffect(() => {
+    if (triggerAdd > 0) {
+      setForm({ title: '', content: '' });
+      setEditItem(null);
+      setShowAdd(true);
+    }
+  }, [triggerAdd]);
 
   const handleSave = async () => {
     if (!form.title) return;
@@ -198,7 +256,6 @@ function NotesTab() {
         </>
       )}
 
-      <FloatingActionButton onClick={() => { setForm({ title: '', content: '' }); setEditItem(null); setShowAdd(true); }} icon={Plus} />
 
       <Modal isOpen={showAdd} onClose={() => { setShowAdd(false); setEditItem(null); }} title={editItem ? 'Edit Note' : 'Add Note'}>
         <div className="flex flex-col gap-4">
@@ -214,7 +271,7 @@ function NotesTab() {
 }
 
 /* ─── Bucket List Tab ────────────────────────────────────── */
-function BucketListTab() {
+function BucketListTab({ triggerAdd }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
@@ -226,6 +283,14 @@ function BucketListTab() {
     jiyaApi.getBucketList().then(setItems).catch(() => {}).finally(() => setLoading(false));
   };
   useEffect(load, []);
+
+  // Handle header "Add" button trigger
+  useEffect(() => {
+    if (triggerAdd > 0) {
+      setNewTitle('');
+      setShowAdd(true);
+    }
+  }, [triggerAdd]);
 
   const handleAdd = async () => {
     if (!newTitle) return;
@@ -314,8 +379,6 @@ function BucketListTab() {
           />
         </>
       )}
-
-      <FloatingActionButton onClick={() => setShowAdd(true)} icon={Plus} />
 
       <Modal isOpen={showAdd} onClose={() => setShowAdd(false)} title="Add Bucket List Item">
         <div className="flex flex-col gap-4">

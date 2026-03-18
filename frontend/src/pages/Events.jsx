@@ -180,7 +180,14 @@ export default function Events() {
 
   return (
     <div className="min-h-dvh p-4 md:p-6 max-w-2xl mx-auto">
-      <PageHeader title="Events & Reminders" onBack={() => navigate('/')} />
+      <PageHeader title="Events & Reminders" onBack={() => navigate('/')}>
+        <Button 
+          onClick={() => { setForm({ title: '', date: '', category: 'custom', description: '', recurring: false }); setEditItem(null); setShowAdd(true); }}
+          className="rounded-full !p-2 md:!p-2.5 shadow-md"
+        >
+          <Plus className="w-5 h-5 md:w-6 md:h-6" />
+        </Button>
+      </PageHeader>
 
       {/* Search */}
       <div className="relative mb-4 md:mb-6">
@@ -277,7 +284,7 @@ export default function Events() {
         </>
       )}
 
-      <FloatingActionButton onClick={() => { setForm({ title: '', date: '', category: 'custom', description: '', recurring: false }); setEditItem(null); setShowAdd(true); }} icon={Plus} />
+
 
       {/* Add/Edit Modal */}
       <Modal isOpen={showAdd} onClose={() => { setShowAdd(false); setEditItem(null); }} title={editItem ? 'Edit Event' : 'Add Event'}>
