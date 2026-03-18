@@ -121,24 +121,24 @@ export default function SmartHeader({ stats }) {
              </span>
            </motion.div>
         ) : reminders.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
             {reminders.map((item, i) => (
               <motion.div
                 key={item.id}
-                whileHover={{ scale: 1.02, y: -4 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.01, y: -2 }}
+                whileTap={{ scale: 0.99 }}
                 className={`
-                  relative flex items-center gap-4 p-5 rounded-[2rem]
+                  relative flex items-center gap-3 p-3.5 rounded-[1.5rem]
                   glass dark:glass-dark shadow-sm
                   transition-all cursor-default overflow-hidden group
                   ${item.urgent ? 'ring-2 ring-accent/20' : ''}
                 `}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 + i * 0.1, type: "spring", stiffness: 100 }}
               >
                 <div className={`
-                  flex items-center justify-center w-12 h-12 rounded-2xl text-xl
+                  flex items-center justify-center w-10 h-10 rounded-xl text-lg
                   ${item.urgent 
                     ? 'bg-danger/10 text-danger animate-pulse' 
                     : 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light'}
@@ -147,12 +147,12 @@ export default function SmartHeader({ stats }) {
                 </div>
                 
                 <div className="flex flex-col min-w-0">
-                  <span className={`text-[10px] font-black uppercase tracking-widest mb-1 ${
+                  <span className={`text-[8px] font-black uppercase tracking-widest mb-0.5 ${
                     item.urgent ? 'text-danger' : 'text-primary dark:text-primary-light'
                   }`}>
                     {item.type}
                   </span>
-                  <span className="text-base font-bold text-text dark:text-text-dark leading-tight truncate">
+                  <span className="text-sm font-bold text-text dark:text-text-dark leading-tight truncate">
                     {item.text}
                   </span>
                 </div>
