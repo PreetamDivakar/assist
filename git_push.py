@@ -15,7 +15,7 @@ def main():
     
     execute("git init")
     execute("git add .")
-    execute('git commit -m "Complete UI overhaul, bug fixes, PWA capability, and responsiveness enhancements"')
+    execute('git commit -m "Fix Render deployment by setting Python version to 3.11.0 and updating API_BASE"')
     execute("git branch -M main")
     
     # Try adding remote, if it fails it might already exist
