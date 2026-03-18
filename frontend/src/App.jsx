@@ -7,6 +7,7 @@ import Birthdays from './pages/Birthdays';
 import Jiya from './pages/Jiya';
 import Pree from './pages/Pree';
 import Events from './pages/Events';
+import AIChatBubble from './components/AIChatBubble';
 import './index.css';
 
 function AnimatedRoutes() {
@@ -39,6 +40,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AnimatedRoutes />
+      <AIChatBubble />
     </BrowserRouter>
   );
 }

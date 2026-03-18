@@ -3,8 +3,11 @@ from sqlalchemy.orm import Session
 from models.models import Event, Birthday
 
 
-def get_next_occurrence(event_date: date) -> date:
+def get_next_occurrence(event_date) -> date:
     """Safe date replacement that handles Feb 29th for non-leap years."""
+    if isinstance(event_date, str):
+        event_date = date.fromisoformat(event_date.split('T')[0][:10])
+    
     today = date.today()
     try:
         this_year = event_date.replace(year=today.year)
@@ -20,8 +23,10 @@ def get_next_occurrence(event_date: date) -> date:
     return this_year
 
 
-def compute_event_days_remaining(event_date: date) -> int:
+def compute_event_days_remaining(event_date) -> int:
     """Compute days remaining until event. For recurring, use next occurrence."""
+    if isinstance(event_date, str):
+        event_date = date.fromisoformat(event_date.split('T')[0][:10])
     today = date.today()
     if event_date >= today:
         return (event_date - today).days

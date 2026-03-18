@@ -1,36 +1,25 @@
+import asyncio
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base, SessionLocal
 from models.models import PersonalDetail
-from routes import birthdays, jiya, pree, events
+from routes import birthdays, jiya, pree, events, chat
 
 # Create all tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(
-    title="Personal Assistant API",
-    description="A personal assistant API for managing birthdays, personal details, notes, bucket lists, and events.",
-    version="1.0.0",
-)
 
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Mount routers
-app.include_router(birthdays.router)
-app.include_router(jiya.router)
-app.include_router(pree.router)
-app.include_router(events.router)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Startup and shutdown events."""
+    # --- Startup ---
+    seed_initial_data()
+    yield
+    # --- Shutdown ---
 
 
-@app.on_event("startup")
-def seed_data():
+def seed_initial_data():
     """Seed initial personal detail records for Jiya and Pree if they don't exist."""
     db = SessionLocal()
     try:
@@ -49,6 +38,30 @@ def seed_data():
         db.close()
 
 
+app = FastAPI(
+    title="Personal Assistant API",
+    description="A personal assistant API for managing birthdays, personal details, notes, bucket lists, events, and AI chat.",
+    version="2.0.0",
+    lifespan=lifespan,
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Mount routers
+app.include_router(birthdays.router)
+app.include_router(jiya.router)
+app.include_router(pree.router)
+app.include_router(events.router)
+app.include_router(chat.router)
+
+
 @app.get("/")
 def root():
-    return {"message": "Personal Assistant API is running", "version": "1.0.0"}
+    return {"message": "Personal Assistant API is running", "version": "2.0.0"}

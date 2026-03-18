@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Cake, Heart, User, CalendarDays, Sun, Moon } from 'lucide-react';
 import { useThemeStore, useDashboardStore } from '../stores/store';
 import { eventApi } from '../api/client';
 import { Badge } from '../components/UI';
+import SmartHeader from '../components/SmartHeader';
 
 const sections = [
   {
@@ -60,29 +61,23 @@ export default function Home() {
       <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
 
-      {/* Theme Toggle */}
-      <motion.button
-        onClick={toggleTheme}
-        className="absolute top-4 right-4 z-10 rounded-full p-3 backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/20"
-        whileHover={{ scale: 1.1, rotate: 15 }}
-        whileTap={{ scale: 0.9 }}
-      >
-        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-      </motion.button>
+      {/* Top-right controls */}
+      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+        <motion.button
+          onClick={toggleTheme}
+          className="rounded-full p-3 backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/20"
+          whileHover={{ scale: 1.1, rotate: 15 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+        </motion.button>
+      </div>
 
-      {/* Title */}
-      <motion.h1
-        className="mb-4 md:mb-8 text-center text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-          My Assistant
-        </span>
-      </motion.h1>
+      {/* Smart Header replaces old static title */}
+      <SmartHeader stats={stats} />
 
       {/* 2×2 Grid */}
-      <div className="grid grid-cols-2 gap-3 md:gap-6" style={{ width: 'min(100vw - 2rem, 100vh - 12rem, 36rem)', height: 'min(100vw - 2rem, 100vh - 12rem, 36rem)' }}>
+      <div className="grid grid-cols-2 gap-3 md:gap-6" style={{ width: 'min(100vw - 2rem, 100vh - 18rem, 36rem)', height: 'min(100vw - 2rem, 100vh - 18rem, 36rem)' }}>
         {sections.map((section, i) => (
           <motion.div
             key={section.path}
@@ -121,7 +116,7 @@ export default function Home() {
       {/* Dashboard footer stats */}
       {stats && (
         <motion.div
-          className="mt-6 flex flex-wrap items-center justify-center gap-3 md:gap-6 text-xs md:text-sm text-text-muted dark:text-text-muted-dark"
+          className="mt-4 flex flex-wrap items-center justify-center gap-3 md:gap-6 text-xs md:text-sm text-text-muted dark:text-text-muted-dark"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
