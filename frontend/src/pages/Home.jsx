@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SmartHeader from '../components/SmartHeader';
 import AIChatBubble from '../components/AIChatBubble';
-import { Calendar } from 'lucide-react';
+import { Calendar, Heart, User, Cake } from 'lucide-react';
+import { useThemeStore, useDashboardStore } from '../stores/store';
+import { eventApi } from '../api/client';
 
 const sections = [
   {
@@ -54,14 +56,12 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative flex min-h-dvh fixed-home items-center justify-center p-4 overflow-hidden">
+    <div className="relative flex flex-col min-h-dvh items-center py-12 px-4">
       {/* BG Glow orbs */}
       <div className="pointer-events-none absolute -top-[10%] -left-[10%] h-[60%] w-[60%] rounded-full bg-primary/10 blur-[120px]" />
       <div className="pointer-events-none absolute -bottom-[10%] -right-[10%] h-[60%] w-[60%] rounded-full bg-accent/10 blur-[120px]" />
 
-      {/* Top-right controls - Removed theme toggle as requested */}
 
-      {/* Smart Header replaces old static title */}
       <SmartHeader stats={stats} />
 
       {/* 2×2 Grid */}

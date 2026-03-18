@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Plus, Trash2, Edit, Clock, Star, Tag, Search } from 'lucide-react';
+import { Calendar, Plus, Trash2, Edit, Clock, Star, Tag, Search, CalendarDays } from 'lucide-react';
 import { eventApi } from '../api/client';
 import {
   EmptyState, SkeletonList, Input, Button, TextArea, Pagination, PageHeader, Badge, FloatingActionButton, Modal, ConfirmDialog
@@ -58,9 +58,9 @@ export default function Events() {
   const currentMonthIdx = new Date().getMonth();
   const currentYear = new Date().getFullYear();
 
+  // Filter out birthdays from general events list as requested
   const allItems = [
-    ...reminders.map(r => ({ ...r, isAutoReminder: true })),
-    ...events,
+    ...events.filter(e => e.category !== 'birthday'),
   ].sort((a, b) => a.days_remaining - b.days_remaining);
 
   const categoryFiltered = filter === 'all' ? allItems : allItems.filter(e => e.category === filter);

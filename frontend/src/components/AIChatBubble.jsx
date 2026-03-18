@@ -193,7 +193,7 @@ export default function AIChatBubble() {
                   </motion.button>
                 </div>
                 <p className="mt-3 text-[10px] text-center text-text-muted dark:text-text-muted-dark opacity-50 uppercase tracking-widest font-medium">
-                  Knows your data • Apple Inspired
+                  he knows you 💀
                 </p>
               </div>
             </motion.div>

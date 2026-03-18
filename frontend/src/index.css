@@ -143,17 +143,3 @@ html {
   opacity: 0.5;
 }
 
-/* Fixed Home layout utility */
-.fixed-home {
-  height: 100dvh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-@media (max-width: 640px) {
-  .fixed-home {
-    height: auto;
-    overflow: auto;
-  }
-}

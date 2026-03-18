@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, CheckCircle2 } from 'lucide-react';
 
 export function Modal({ isOpen, onClose, title, children }) {

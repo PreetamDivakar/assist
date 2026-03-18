@@ -32,15 +32,8 @@ export default function Birthdays() {
           ? await birthdayApi.getAll()
           : await birthdayApi.getByMonth(currentMonth);
       
-      // Sort by month and day ascending
-      const sorted = (Array.isArray(data) ? data : []).sort((a, b) => {
-        const dateA = new Date(a.date);
-        const dateB = new Date(b.date);
-        if (dateA.getMonth() !== dateB.getMonth()) {
-          return dateA.getMonth() - dateB.getMonth();
-        }
-        return dateA.getDate() - dateB.getDate();
-      });
+      // Sort by days_remaining (closest first) as requested
+      const sorted = (Array.isArray(data) ? data : []).sort((a, b) => a.days_remaining - b.days_remaining);
       
       setBirthdays(sorted);
     } catch (e) {
