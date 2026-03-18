@@ -131,18 +131,18 @@ function DetailsTab() {
         {FIELD_MAP[section].map(({ key, label }) => {
           const val = form[section]?.[key];
           return (
-            <div key={key} className="flex items-center gap-2 md:gap-3">
-              <span className="w-24 md:w-28 text-[10px] md:text-xs font-medium capitalize text-text-muted dark:text-text-muted-dark truncate">
+            <div key={key} className="flex items-center gap-2 md:gap-3 p-3 box-in-box mb-1 last:mb-0">
+              <span className="w-24 md:w-28 text-[10px] md:text-xs font-black uppercase tracking-widest text-primary/70 dark:text-primary-light/50 truncate px-1">
                 {label}
               </span>
               {editing ? (
                 <Input
                   value={val || ''}
                   onChange={(e) => updateField(section, key, e.target.value)}
-                  className="!py-1 !px-2 !text-xs"
+                  className="!py-1 !px-2 !text-xs flex-1"
                 />
               ) : (
-                <span className="text-xs md:text-sm truncate font-medium">{val || '—'}</span>
+                <span className="text-sm md:text-base truncate font-bold text-text dark:text-white flex-1 text-right md:text-left">{val || '—'}</span>
               )}
             </div>
           );
