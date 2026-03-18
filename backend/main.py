@@ -28,9 +28,8 @@ def seed_initial_data():
             if not existing:
                 detail = PersonalDetail(
                     person=person,
-                    clothing_sizes={"top": "", "bottom": "", "shoe": "", "dress": ""},
-                    contact_info={"phone": "", "email": "", "address": ""},
-                    preferences={"favorite_color": "", "favorite_food": "", "hobbies": ""},
+                    clothing_sizes={},
+                    personal={},
                 )
                 db.add(detail)
         db.commit()

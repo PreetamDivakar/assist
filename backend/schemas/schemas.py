@@ -37,16 +37,14 @@ class BirthdayResponse(BaseModel):
 
 class PersonalDetailUpdate(BaseModel):
     clothing_sizes: Optional[dict] = None
-    contact_info: Optional[dict] = None
-    preferences: Optional[dict] = None
+    personal: Optional[dict] = None
 
 
 class PersonalDetailResponse(BaseModel):
     id: int
     person: str
     clothing_sizes: dict
-    contact_info: dict
-    preferences: dict
+    personal: dict
     updated_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}

@@ -15,8 +15,7 @@ def update_personal_details(db: Session, person: str, data: dict):
         detail = PersonalDetail(
             person=person,
             clothing_sizes=data.get("clothing_sizes", {}),
-            contact_info=data.get("contact_info", {}),
-            preferences=data.get("preferences", {}),
+            personal=data.get("personal", {}),
         )
         db.add(detail)
     else:
