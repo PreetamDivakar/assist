@@ -92,7 +92,7 @@ export default function SmartHeader({ stats }) {
 
         {/* Dynamic Greeting */}
         <motion.h1
-          className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-6"
+          className="text-2xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-6 flex flex-wrap items-baseline gap-x-3"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
@@ -100,11 +100,10 @@ export default function SmartHeader({ stats }) {
           <span className="text-text dark:text-text-dark">
             {greeting},
           </span>
-          <br />
-          <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent italic mr-2">
+          <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent italic">
             Preetam!
           </span>
-          <span className="text-2xl md:text-3xl lg:text-4xl align-middle">✨</span>
+          <span className="text-xl md:text-3xl lg:text-4xl align-middle">✨</span>
         </motion.h1>
 
         {/* "Funky" Glassmorphic Reminders */}
