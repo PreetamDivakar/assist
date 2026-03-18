@@ -74,7 +74,9 @@ export default function Birthdays() {
 
   const openEdit = (b) => {
     setEditItem(b);
-    setForm({ name: b.name, date: b.date, notes: b.notes || '' });
+    // Ensure date is in YYYY-MM-DD format for the input
+    const dateStr = b.date ? b.date.split('T')[0] : '';
+    setForm({ name: b.name, date: dateStr, notes: b.notes || '' });
     setShowAdd(true);
   };
 
@@ -208,7 +210,7 @@ export default function Birthdays() {
           <Input label="Name" value={form.name} onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Enter name" />
           <Input label="Date" type="date" value={form.date} onChange={(e) => setForm(p => ({ ...p, date: e.target.value }))} />
           <TextArea label="Notes" value={form.notes} onChange={(e) => setForm(p => ({ ...p, notes: e.target.value }))} placeholder="Optional notes" rows={2} />
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleSave} isLoading={loading}>Save</Button>
         </div>
       </Modal>
 

@@ -110,7 +110,7 @@ export default function Events() {
     setEditItem(e);
     setForm({
       title: e.title,
-      date: e.date,
+      date: e.date ? e.date.split('T')[0] : '',
       category: e.category,
       description: e.description || '',
       recurring: e.recurring,
