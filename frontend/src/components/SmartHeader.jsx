@@ -14,6 +14,7 @@ function getGreeting() {
 export default function SmartHeader({ stats }) {
   const navigate = useNavigate();
   const [reminders, setReminders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch upcoming birthday reminders + today's events
@@ -62,6 +63,7 @@ export default function SmartHeader({ stats }) {
       });
 
       setReminders(items.slice(0, 4)); // Max 4 reminders shown
+      setLoading(false);
     });
   }, []);
 
@@ -107,7 +109,17 @@ export default function SmartHeader({ stats }) {
         </motion.h1>
 
         {/* "Funky" Glassmorphic Reminders */}
-        {reminders.length > 0 ? (
+        {loading ? (
+             <motion.div
+             className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white/30 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10"
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+           >
+             <span className="text-sm font-medium text-text-muted dark:text-text-muted-dark italic animate-pulse">
+               ⚡ Loading reminders...
+             </span>
+           </motion.div>
+        ) : reminders.length > 0 ? (
           <div className="flex flex-wrap gap-3">
             {reminders.map((item, i) => (
               <motion.div
@@ -125,7 +137,7 @@ export default function SmartHeader({ stats }) {
                 `}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 + i * 0.1, type: "spring", stiffness: 100 }}
+                transition={{ delay: 0.1 + i * 0.1, type: "spring", stiffness: 100 }}
               >
                 {/* Background Shimmer Effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
@@ -152,19 +164,7 @@ export default function SmartHeader({ stats }) {
               </motion.div>
             ))}
           </div>
-        ) : (
-          <motion.div
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white/30 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <span className="text-lg">🌈</span>
-            <span className="text-sm font-medium text-text-muted dark:text-text-muted-dark italic">
-              All clear! Enjoy your {new Date().getHours() < 17 ? 'productive day' : 'evening'}...
-            </span>
-          </motion.div>
-        )}
+        ) : null}
       </div>
     </motion.div>
   );
