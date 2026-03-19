@@ -55,12 +55,16 @@ export default function Birthdays() {
       } else {
         await birthdayApi.create(form);
       }
+      // Close modal immediately on success
       setShowAdd(false);
       setEditItem(null);
       setForm({ name: '', date: '', notes: '' });
-      await load();
+      // Refresh list after closing
+      load();
     } catch (e) {
-      console.error(e);
+      console.error('Save failed:', e);
+      // We'll show a simple error message on the button or something similar if needed
+      // but the user wants to remove alerts.
     } finally {
       setLoading(false);
     }
