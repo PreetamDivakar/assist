@@ -108,9 +108,18 @@ const ReminderCarousel = ({ reminders }) => {
                   {item.dayLabel}
                 </span>
               </div>
-              <span className="text-lg md:text-xl font-black text-text dark:text-text-dark leading-none truncate block w-full text-left">
-                {item.name.replace(/'s birthday/i, '').replace(/ birthday/i, '')}
-              </span>
+              <div className="flex items-end justify-between w-full gap-2">
+                <span className="text-lg md:text-xl font-black text-text dark:text-text-dark leading-none truncate block flex-1">
+                  {item.name.replace(/'s birthday/i, '').replace(/ birthday/i, '')}
+                </span>
+                {item.dateLabel && (
+                  <span className={`text-[10px] font-black uppercase tracking-[0.1em] shrink-0 ${
+                    item.urgent ? 'text-accent' : 'text-text-muted dark:text-text-muted-dark'
+                  }`}>
+                    {item.dateLabel}
+                  </span>
+                )}
+              </div>
             </div>
           </motion.div>
         </AnimatePresence>
@@ -162,13 +171,16 @@ export default function SmartHeader({ stats }) {
         
         const items = [];
 
-        // Process Birthdays - Only birthdays as requested
+        // Process Birthdays - Only birthdays within 7 days as requested
         (Array.isArray(birthdayReminders) ? birthdayReminders : [])
-          .filter(b => b.days_remaining >= 0)
+          .filter(b => b.days_remaining >= 0 && b.days_remaining <= 7)
           .sort((a, b) => a.days_remaining - b.days_remaining)
           .slice(0, 5) // Limit to 5 as requested
           .forEach(b => {
             const isToday = b.days_remaining === 0;
+            const dateObj = new Date(b.date);
+            const dateLabel = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            
             items.push({
               id: `bday-${b.id}`,
               icon: isToday ? '🥳' : '🎂',
@@ -176,7 +188,8 @@ export default function SmartHeader({ stats }) {
               type: 'Birthday',
               urgent: isToday,
               daysRemaining: b.days_remaining,
-              dayLabel: isToday ? 'Today' : `In ${b.days_remaining} d`
+              dayLabel: isToday ? 'Today' : `In ${b.days_remaining} d`,
+              dateLabel: dateLabel
             });
           });
 

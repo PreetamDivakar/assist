@@ -7,6 +7,8 @@ import {
   EmptyState, SkeletonList, Input, Button, TextArea, Pagination, PageHeader, Badge, FloatingActionButton, Modal, ConfirmDialog, LoadingOverlay
 } from '../components/UI';
 
+import { useSwipe } from '../hooks/useSwipe';
+
 const ITEMS_PER_PAGE = 10;
 
 export default function Birthdays() {
@@ -14,7 +16,7 @@ export default function Birthdays() {
   const [birthdays, setBirthdays] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('month'); // 'month' or 'all'
+  const [filter, setFilter] = useState('week'); // 'week', 'month' or 'all'
   const [currentPage, setCurrentPage] = useState(1);
   const [showAdd, setShowAdd] = useState(false);
   const [editItem, setEditItem] = useState(null);
@@ -22,20 +24,42 @@ export default function Birthdays() {
   const [error, setError] = useState(null);
   const [form, setForm] = useState({ name: '', date: '', notes: '' });
 
+  const flipFilter = (direction) => {
+    const modes = ['week', 'month', 'all'];
+    const currentIndex = modes.indexOf(filter);
+    if (direction === 'next' && currentIndex < modes.length - 1) {
+      setFilter(modes[currentIndex + 1]);
+    } else if (direction === 'prev' && currentIndex > 0) {
+      setFilter(modes[currentIndex - 1]);
+    }
+  };
+
+  const swipeHandlers = useSwipe({
+    onSwipeLeft: () => flipFilter('next'),
+    onSwipeRight: () => flipFilter('prev'),
+  });
+
   const currentMonth = new Date().getMonth() + 1;
 
   const load = async () => {
     setLoading(true);
     try {
-      const data = search
-        ? await birthdayApi.getAll(search)
-        : filter === 'all'
-          ? await birthdayApi.getAll()
-          : await birthdayApi.getByMonth(currentMonth);
+      const allData = await birthdayApi.getAll();
+      let filtered;
       
-      // Sort by days_remaining (closest first) as requested
-      const sorted = (Array.isArray(data) ? data : []).sort((a, b) => a.days_remaining - b.days_remaining);
+      if (search) {
+        filtered = allData.filter(b => b.name.toLowerCase().includes(search.toLowerCase()));
+      } else if (filter === 'all') {
+        filtered = allData;
+      } else if (filter === 'week') {
+        filtered = allData.filter(b => b.days_remaining <= 7);
+      } else {
+        // filter === 'month'
+        filtered = allData.filter(b => new Date(b.date).getMonth() + 1 === currentMonth);
+      }
       
+      // Sort by days_remaining (closest first)
+      const sorted = filtered.sort((a, b) => a.days_remaining - b.days_remaining);
       setBirthdays(sorted);
     } catch (e) {
       console.error(e);
@@ -49,6 +73,7 @@ export default function Birthdays() {
   const handleSave = async () => {
     if (!form.name || !form.date) return;
     setLoading(true);
+    console.log("Saving Birthday:", form);
     try {
       if (editItem) {
         await birthdayApi.update(editItem.id, form);
@@ -63,8 +88,7 @@ export default function Birthdays() {
       load();
     } catch (e) {
       console.error('Save failed:', e);
-      // We'll show a simple error message on the button or something similar if needed
-      // but the user wants to remove alerts.
+      alert("Error: " + e.message);
     } finally {
       setLoading(false);
     }
@@ -89,7 +113,10 @@ export default function Birthdays() {
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
   return (
-    <div className="min-h-dvh p-4 md:p-6 max-w-2xl mx-auto">
+    <div 
+      className="min-h-dvh p-4 md:p-6 max-w-2xl mx-auto touch-pan-y"
+      {...swipeHandlers}
+    >
       <PageHeader title="Birthdays" onBack={() => navigate('/')}>
         <Button 
           onClick={() => { setForm({ name: '', date: '', notes: '' }); setEditItem(null); setShowAdd(true); }}
@@ -115,6 +142,16 @@ export default function Birthdays() {
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex gap-1 rounded-2xl glass dark:glass-dark p-1 shadow-sm w-fit">
             <button
+              onClick={() => setFilter('week')}
+              className={`rounded-xl px-4 py-2 text-sm font-bold transition-all ${
+                filter === 'week'
+                  ? 'bg-white dark:bg-white/10 shadow-sm text-primary dark:text-white'
+                  : 'text-text-muted hover:text-text dark:text-text-muted-dark'
+              }`}
+            >
+              This Week
+            </button>
+            <button
               onClick={() => setFilter('month')}
               className={`rounded-xl px-4 py-2 text-sm font-bold transition-all ${
                 filter === 'month'
@@ -135,11 +172,15 @@ export default function Birthdays() {
               View All
             </button>
           </div>
-          {filter === 'month' && (
-            <p className="text-xs md:text-sm text-text-muted dark:text-text-muted-dark">
-              Showing <span className="font-semibold text-primary">{months[currentMonth - 1]}</span>
-            </p>
-          )}
+          <p className="text-xs md:text-sm text-text-muted dark:text-text-muted-dark">
+            {filter === 'month' ? (
+              <>Showing <span className="font-semibold text-primary">{months[currentMonth - 1]}</span></>
+            ) : filter === 'week' ? (
+              <>Next <span className="font-semibold text-primary">7 Days</span></>
+            ) : (
+              <>Showing <span className="font-semibold text-primary">All</span></>
+            )}
+          </p>
         </div>
       )}
 
@@ -228,7 +269,7 @@ export default function Birthdays() {
         message="Are you sure you want to delete this birthday?"
       />
 
-      <LoadingOverlay isActive={loading} message={editItem ? "Updating..." : "Creating..."} />
+      <LoadingOverlay isActive={loading} message={editItem ? "Updating..." : "Loading..."} />
     </div>
   );
 }

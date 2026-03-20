@@ -7,6 +7,8 @@ import {
   EmptyState, SkeletonList, Input, Button, TextArea, Pagination, PageHeader, Badge, FloatingActionButton, Modal, ConfirmDialog, LoadingOverlay
 } from '../components/UI';
 
+import { useSwipe } from '../hooks/useSwipe';
+
 const ITEMS_PER_PAGE = 10;
 
 const categoryColors = {
@@ -35,6 +37,11 @@ export default function Events() {
   const [editItem, setEditItem] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [form, setForm] = useState({ title: '', date: '', category: 'personal', description: '', recurring: false });
+
+  const swipeHandlers = useSwipe({
+    onSwipeLeft: () => timeFilter === 'week' && setTimeFilter('all'),
+    onSwipeRight: () => timeFilter === 'all' && setTimeFilter('week'),
+  });
 
   const load = async () => {
     setLoading(true);
@@ -81,6 +88,7 @@ export default function Events() {
   const handleSave = async () => {
     if (!form.title || !form.date) return;
     setLoading(true);
+    console.log("Saving Event:", form);
     try {
       if (editItem) {
         await eventApi.update(editItem.id, form);
@@ -93,6 +101,7 @@ export default function Events() {
       await load();
     } catch (e) {
       console.error(e);
+      alert("Error: " + e.message);
     } finally {
       setLoading(false);
     }
@@ -178,7 +187,10 @@ export default function Events() {
   };
 
   return (
-    <div className="min-h-dvh p-4 md:p-6 max-w-2xl mx-auto">
+    <div 
+      className="min-h-dvh p-4 md:p-6 max-w-2xl mx-auto touch-pan-y"
+      {...swipeHandlers}
+    >
       <PageHeader title="Events & Reminders" onBack={() => navigate('/')}>
         <Button 
           onClick={() => { setForm({ title: '', date: '', category: 'personal', description: '', recurring: false }); setEditItem(null); setShowAdd(true); }}
@@ -311,7 +323,7 @@ export default function Events() {
 
       <ConfirmDialog isOpen={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={handleDelete} title="Delete Event" message="Are you sure?" />
       
-      <LoadingOverlay isActive={loading} message={editItem ? "Updating..." : "Creating..."} />
+      <LoadingOverlay isActive={loading} message={editItem ? "Updating..." : "Loading..."} />
     </div>
   );
 }

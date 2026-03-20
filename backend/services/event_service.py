@@ -152,9 +152,9 @@ def get_dashboard_stats(db: Session) -> dict:
     completed = sum(1 for i in bucket_items if i.completed)
 
     return {
-        "upcoming_events_count": sum(1 for e in combined if 0 < e["days_remaining"] <= 7),
+        "upcoming_events_count": sum(1 for e in all_events if 0 < e["days_remaining"] <= 7),
         "today_events_count": sum(1 for e in combined if e["days_remaining"] == 0),
-        "upcoming_birthdays_count": sum(1 for e in birthday_reminders if e["days_remaining"] <= 5),
+        "upcoming_birthdays_count": sum(1 for e in birthday_reminders if 0 < e["days_remaining"] <= 7),
         "bucket_list_total": total,
         "bucket_list_completed": completed,
     }

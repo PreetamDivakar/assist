@@ -7,6 +7,8 @@ import {
   EmptyState, SkeletonList, Input, Button, TextArea, Pagination, PageHeader, FloatingActionButton, Modal, ConfirmDialog
 } from '../components/UI';
 
+import { useSwipe } from '../hooks/useSwipe';
+
 const ITEMS_PER_PAGE = 10;
 
 const TABS = [
@@ -21,8 +23,25 @@ export default function Jiya() {
   const [triggerAddNote, setTriggerAddNote] = useState(0);
   const [triggerAddBucket, setTriggerAddBucket] = useState(0);
 
+  const switchTab = (direction) => {
+    const currentIndex = TABS.findIndex(t => t.id === activeTab);
+    if (direction === 'next' && currentIndex < TABS.length - 1) {
+      setActiveTab(TABS[currentIndex + 1].id);
+    } else if (direction === 'prev' && currentIndex > 0) {
+      setActiveTab(TABS[currentIndex - 1].id);
+    }
+  };
+
+  const swipeHandlers = useSwipe({
+    onSwipeLeft: () => switchTab('next'),
+    onSwipeRight: () => switchTab('prev'),
+  });
+
   return (
-    <div className="min-h-dvh p-4 md:p-6 max-w-2xl mx-auto">
+    <div 
+      className="min-h-dvh p-4 md:p-6 max-w-2xl mx-auto touch-pan-y"
+      {...swipeHandlers}
+    >
       <PageHeader title="Jiya" onBack={() => navigate('/')}>
         {activeTab === 'notes' && (
           <Button 
@@ -101,12 +120,14 @@ function DetailsTab() {
 
   const handleSave = async () => {
     setLoading(true);
+    console.log("Saving Jiya Details:", form);
     try {
       const updated = await jiyaApi.updateDetails(form);
       setDetails(updated);
       setEditing(false);
     } catch (e) {
       console.error(e);
+      alert("Error: " + e.message);
     } finally {
       setLoading(false);
     }
@@ -223,15 +244,21 @@ function NotesTab({ triggerAdd }) {
 
   const handleSave = async () => {
     if (!form.title) return;
-    if (editItem) {
-      await jiyaApi.updateNote(editItem.id, form);
-    } else {
-      await jiyaApi.createNote(form);
+    console.log("Saving Jiya Note:", form);
+    try {
+      if (editItem) {
+        await jiyaApi.updateNote(editItem.id, form);
+      } else {
+        await jiyaApi.createNote(form);
+      }
+      setShowAdd(false);
+      setEditItem(null);
+      setForm({ title: '', content: '' });
+      load();
+    } catch (e) {
+      console.error(e);
+      alert("Error: " + e.message);
     }
-    setShowAdd(false);
-    setEditItem(null);
-    setForm({ title: '', content: '' });
-    load();
   };
 
   const handleDelete = async () => {
